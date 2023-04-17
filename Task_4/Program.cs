@@ -2,6 +2,7 @@
 using System.Globalization;
 using Task_4.Part_1;
 using Task_4.Part_2;
+using Task_4.Part_3;
 
 namespace Task_4
 {
@@ -31,10 +32,10 @@ namespace Task_4
                         WorkWithAlive();
                         break;
                     case "3":
-                        
+                        FibonacciUsingLoop();
                         break;
                     case "4":
-                        
+                        FibonacciUsingRecursion();
                         break;
                     case "5":
 
@@ -53,33 +54,6 @@ namespace Task_4
 
             } while (answer == "Y");
         }
-
-        #region case2
-        public static void WorkWithAlive()
-        {
-            Wolf wolf = new Wolf("Alpha");
-            Rabbit rabbit = new Rabbit("Peter");
-            Bear bear = new Bear ("Yogi");
-            Rose rose = new Rose ("Red Rose");
-            Grass grass = new Grass ("Green Grass");
-
-            Console.WriteLine(wolf.GetName());    
-            Console.WriteLine(rabbit.GetName());  
-            Console.WriteLine(bear.GetName());    
-            Console.WriteLine(rose.GetName());    
-            Console.WriteLine(grass.GetName());   
-
-            Console.WriteLine(wolf.GetIndividualName());  
-            Console.WriteLine(rabbit.GetIndividualName());
-            Console.WriteLine(bear.GetIndividualName());   
-
-            rabbit.Eat(rose);  
-            bear.Eat(grass);   
-
-            wolf.Eat(rabbit);  
-            bear.Eat(wolf);    
-        }
-        #endregion
 
         #region case1
         public static void WorkWithShapes()
@@ -132,6 +106,64 @@ namespace Task_4
             Console.WriteLine($"Perimeter: {Math.Round(shape.GetPerimeter(),3)}\nArea: {Math.Round(shape.GetArea(),3)}");
         }
         #endregion
+
+        #region case2
+        public static void WorkWithAlive()
+        {
+            Wolf wolf = new Wolf("Alpha");
+            Rabbit rabbit = new Rabbit("Peter");
+            Bear bear = new Bear("Yogi");
+            Rose rose = new Rose("Red Rose");
+            Grass grass = new Grass("Green Grass");
+
+            Console.WriteLine(wolf.GetName());
+            Console.WriteLine(rabbit.GetName());
+            Console.WriteLine(bear.GetName());
+            Console.WriteLine(rose.GetName());
+            Console.WriteLine(grass.GetName());
+
+            Console.WriteLine(wolf.GetIndividualName());
+            Console.WriteLine(rabbit.GetIndividualName());
+            Console.WriteLine(bear.GetIndividualName());
+
+            rabbit.Eat(rose);
+            bear.Eat(grass);
+
+            wolf.Eat(rabbit);
+            bear.Eat(wolf);
+        }
+        #endregion
+
+        #region case3
+        public static void FibonacciUsingLoop()
+        {
+            Console.Write("Enter a natural number: ");
+            try
+            {
+                int number = int.Parse(Console.ReadLine());
+                Fibonacci fibonacci = new Fibonacci(number);
+                fibonacci.FibonacciSeries();
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+        }
+        #endregion
+
+        #region case4
+        public static void FibonacciUsingRecursion()
+        {
+            Console.Write("Enter a natural number: ");
+            try
+            {
+                int number1 = int.Parse(Console.ReadLine());
+                Fibonacci fibonacci1 = new Fibonacci(number1);
+                Console.Write($"Fibonacci numbers up to {number1}: ");
+                fibonacci1.FibonacciSeries(0, 1);
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+            Console.WriteLine();
+        }
+        #endregion
+
     }
 
 }
