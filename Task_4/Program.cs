@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Task_4.Part_1;
+using Task_4.Part_2;
 
 namespace Task_4
 {
@@ -13,7 +14,7 @@ namespace Task_4
             {
                 Console.WriteLine("Choose:");
                 Console.WriteLine("1 - Shapes");
-                Console.WriteLine("2 - Animals");
+                Console.WriteLine("2 - Alive");
                 Console.WriteLine("3 - Fibonacci numbers using a loop");
                 Console.WriteLine("4 - Fibonacci numbers using recursion");
                 Console.WriteLine("5 - Polynomial");
@@ -27,7 +28,7 @@ namespace Task_4
                         WorkWithShapes();
                         break;
                     case "2":
-                        
+                        WorkWithAlive();
                         break;
                     case "3":
                         
@@ -52,6 +53,33 @@ namespace Task_4
 
             } while (answer == "Y");
         }
+
+        #region case2
+        public static void WorkWithAlive()
+        {
+            Wolf wolf = new Wolf("Alpha");
+            Rabbit rabbit = new Rabbit("Peter");
+            Bear bear = new Bear ("Yogi");
+            Rose rose = new Rose ("Red Rose");
+            Grass grass = new Grass ("Green Grass");
+
+            Console.WriteLine(wolf.GetName());    
+            Console.WriteLine(rabbit.GetName());  
+            Console.WriteLine(bear.GetName());    
+            Console.WriteLine(rose.GetName());    
+            Console.WriteLine(grass.GetName());   
+
+            Console.WriteLine(wolf.GetIndividualName());  
+            Console.WriteLine(rabbit.GetIndividualName());
+            Console.WriteLine(bear.GetIndividualName());   
+
+            rabbit.Eat(rose);  
+            bear.Eat(grass);   
+
+            wolf.Eat(rabbit);  
+            bear.Eat(wolf);    
+        }
+        #endregion
 
         #region case1
         public static void WorkWithShapes()
