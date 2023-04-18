@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Task_4.Part_3_4
+﻿
+namespace Task_4.Part34
 {
     public class Fibonacci
     {
-        private int _number;
+        private int number;
         public Fibonacci(int number) 
         { 
-            _number = number;
+            this.number = number;
         }
          public void FibonacciSeries()
         {
@@ -19,13 +14,13 @@ namespace Task_4.Part_3_4
             int second = 1;
             int next = 0;
 
-            Console.Write("Fibonacci numbers up to " + _number + ": ");
+            Console.Write("Fibonacci numbers up to " + number + ": ");
             Console.Write($"{first} {second} ");
 
-            while (next <= _number)
+            while (next <= number)
             {
                 next = first + second;
-                if (next <= _number)
+                if (next <= number)
                 {
                     Console.Write(next + " ");
                 }
@@ -37,7 +32,7 @@ namespace Task_4.Part_3_4
 
         public void FibonacciSeries(int beforePreviousValue, int previousValue)
         {
-            if (previousValue <= _number)
+            if (previousValue <= number)
             {
                 Console.Write($"{previousValue} ");
                 int currentValue = beforePreviousValue + previousValue;
