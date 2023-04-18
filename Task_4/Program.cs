@@ -1,9 +1,9 @@
-﻿using Task_4.Part1;
-using Task_4.Part2;
-using Task_4.Part34;
-using Task_4.Part5;
+﻿using Task4.Part1;
+using Task4.Part2;
+using Task4.Part34;
+using Task4.Part5;
 
-namespace Task_4
+namespace Task4
 {
     class Program
     {

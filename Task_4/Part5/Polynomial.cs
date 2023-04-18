@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Task_4.Part5
+namespace Task4.Part5
 {
     public class Polynomial
     {

@@ -1,5 +1,5 @@
 ﻿
-namespace Task_4.Part2
+namespace Task4.Part2
 {
     public class Rabbit : Animal, IHerbivore
     {

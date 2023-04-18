@@ -1,5 +1,5 @@
 ﻿
-namespace Task_4.Part1
+namespace Task4.Part1
 {
     public class Square : Shape
     {

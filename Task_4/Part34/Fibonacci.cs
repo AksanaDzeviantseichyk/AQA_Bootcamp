@@ -1,5 +1,5 @@
 ﻿
-namespace Task_4.Part34
+namespace Task4.Part34
 {
     public class Fibonacci
     {
