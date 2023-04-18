@@ -2,7 +2,8 @@
 using System.Globalization;
 using Task_4.Part_1;
 using Task_4.Part_2;
-using Task_4.Part_3;
+using Task_4.Part_3_4;
+using Task_4.Part_5;
 
 namespace Task_4
 {
@@ -38,7 +39,7 @@ namespace Task_4
                         FibonacciUsingRecursion();
                         break;
                     case "5":
-
+                        WorkWithPolynomial();
                         break;
                     case "6":
 
@@ -47,8 +48,6 @@ namespace Task_4
                         Console.WriteLine("Unknown operation");
                         break;
                 }
-
-
                 Console.WriteLine("Do you want to repeat (YES/NO)? If YES enter Y:");
                 answer = Console.ReadLine().ToUpper();
 
@@ -164,6 +163,19 @@ namespace Task_4
         }
         #endregion
 
+        #region case5
+        public static void WorkWithPolynomial()
+        {
+            Polynomial p1 = new Polynomial(-3, 0, 4, 0, 0, 5, 0, -12);
+            Polynomial p2 = new Polynomial(2, -1, 3, 0, 4);
+
+            Console.WriteLine($"First polynomial:\np1 = {p1}");
+            Console.WriteLine($"Second polynomial:\np2 = {p2}");
+            Console.WriteLine($"An example of adding two polynomials:\np1 + p2 = {p1 + p2}");
+            Console.WriteLine($"An example of subtracting two polynomials:\np1 - p2 = {p1 - p2}");
+            Console.WriteLine($"An example of multiplying two polynomials:\np1 * p2 = {p1 * p2}");
+        }
+        #endregion
     }
 
 }
