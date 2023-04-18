@@ -4,20 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Task_4.Part_2
+namespace Task_4.Part2
 {
-    public class Animal : Alive
+    public class Herbal : Alive
     {
         protected string name;
-
-        public Animal(string name)
-        {
-            this.name = name;
-        }
-
+        
+        public Herbal(string name)
+        { this.name = name; }
         public override string GetName()
         {
-            return "Animal";
+            return "Herbal";
         }
 
         public virtual string GetIndividualName()

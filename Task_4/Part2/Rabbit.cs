@@ -4,19 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Task_4.Part_2
+namespace Task_4.Part2
 {
-    public class Bear : Animal, ICarnivore, IHerbivore
+    public class Rabbit : Animal, IHerbivore
     {
-        public Bear(String name) : base(name) { }
+        public Rabbit(String name) : base(name) { }
         public override string GetName()
         {
-            return "Bear";
-        }
-
-        public void Eat(Animal food)
-        {
-            Console.WriteLine($"{name} is eating {food.GetName()}");
+            return "Rabbit";
         }
 
         public void Eat(Herbal food)

@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Task_4.Part_2
+namespace Task_4.Part2
 {
-    public class Rose : Herbal
+    public class Grass : Herbal
     {
-        public Rose(String name) : base(name) { }
+        public Grass(String name) : base(name) { }
         public override string GetName()
         {
-            return "Rose";
+            return "Grass";
         }
     }
 }
