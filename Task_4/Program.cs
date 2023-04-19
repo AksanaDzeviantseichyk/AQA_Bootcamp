@@ -2,6 +2,7 @@
 using Task4.Part2;
 using Task4.Part34;
 using Task4.Part5;
+using Task4.Part6;
 
 namespace Task4
 {
@@ -40,7 +41,7 @@ namespace Task4
                         WorkWithPolynomial();
                         break;
                     case "6":
-
+                        WorkWithLigthstring();
                         break;
                     default:
                         Console.WriteLine("Unknown operation");
@@ -172,6 +173,38 @@ namespace Task4
             Console.WriteLine($"An example of adding two polynomials:\np1 + p2 = {p1 + p2}");
             Console.WriteLine($"An example of subtracting two polynomials:\np1 - p2 = {p1 - p2}");
             Console.WriteLine($"An example of multiplying two polynomials:\np1 * p2 = {p1 * p2}");
+        }
+        #endregion
+        
+        #region case6
+        public static void WorkWithLigthstring()
+        {
+            
+            String answer;
+            Console.Write("Enter the number of the bulbs in the Lightstring: ");
+            try
+            {
+                int numBulb = int.Parse(Console.ReadLine());
+                Lightstring simpleLightstring = new SimpleLightstring(numBulb);
+                Lightstring coloredLightstring = new ColoredLightstring(numBulb);
+            
+                do
+                {
+                    Console.Clear();
+                    simpleLightstring.UpdateState();
+                    coloredLightstring.UpdateState();
+                    Console.WriteLine($"Current minute is {DateTime.Now.Minute}\nCurrent State Lightstrings:");
+                    Console.WriteLine("\nSimple Lightstring:");
+                    Console.WriteLine(simpleLightstring.GetCurrentState());
+
+                    Console.WriteLine("\nColored Lightstring:");
+                    Console.WriteLine(coloredLightstring.GetCurrentState());
+
+                    Console.WriteLine("\nDo you want to update state of Lightstrings? If YES enter Y:");
+                    answer = Console.ReadLine().ToUpper();
+                } while (answer == "Y");
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
         }
         #endregion
     }
