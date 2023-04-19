@@ -154,7 +154,7 @@ namespace Task4
             {
                 int number1 = int.Parse(Console.ReadLine());
                 Fibonacci fibonacci1 = new Fibonacci(number1);
-                Console.Write($"Fibonacci numbers up to {number1}: ");
+                Console.Write($"Fibonacci numbers up to {number1}: 0 ");
                 fibonacci1.FibonacciSeries(0, 1);
             }
             catch (Exception ex) { Console.WriteLine(ex.Message); }
