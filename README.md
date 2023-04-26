@@ -1,6 +1,6 @@
 # Task5
 
-####Write positive unit tests using NUnit library for public methods Open() and GetCurrentField() of 'GameProcessor'  class.
+#### Write positive unit tests using NUnit library for public methods Open() and GetCurrentField() of 'GameProcessor'  class.
 
 'Console' project contains logic about input data from console and output data to console.
 
