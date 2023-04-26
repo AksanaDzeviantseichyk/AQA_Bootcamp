@@ -20,13 +20,13 @@ namespace Minesweeper.Tests
             { false, false, false }
         };
         }
-        //Positive tests
-        [TestCase(1,1)]
+        //Positive scenarios
+        [TestCase(1, 1)]
         [Test]
         public void Open_CellWithoutMine_Success(int row, int col)
         {
             // Precondition
-            
+
             var gameProcessor = new GameProcessor(boolField);
 
             // Action
@@ -34,9 +34,9 @@ namespace Minesweeper.Tests
 
             // Assert
             Assert.AreEqual(GameState.Active, gameState);
-           
+
         }
-        [TestCase(0,0)]
+        [TestCase(0, 0)]
         [Test]
         public void Open_CellWithMine_Lose(int row, int col)
         {
@@ -45,20 +45,20 @@ namespace Minesweeper.Tests
 
             // Action
             var gameState = gameProcessor.Open(row, col);
-            
+
             // Assert
             Assert.AreEqual(GameState.Lose, gameState);
         }
-        [TestCase(2,2)]
+        [TestCase(2, 2)]
         [Test]
         public void Open_AllCellWithoutMine_Win(int row, int col)
         {
             // Precondition
             var gameProcessor = new GameProcessor(boolField);
-            
+
             // Action
             var gameState = gameProcessor.Open(row, col);
-            
+
             // Assert
             Assert.AreEqual(GameState.Win, gameState);
 
@@ -70,30 +70,36 @@ namespace Minesweeper.Tests
         {
             // Precondition
             var gameProcessor = new GameProcessor(boolField);
-            
+
             // Action
             gameProcessor.Open(row, col);
             var gameState = gameProcessor.Open(row, col);
-            
+
             // Assert
             Assert.AreEqual(GameState.Active, gameState);
 
         }
-
-        [Test]
-        public void GetCurrentField_CountNumberOfMineNeighbors_NumberOfMineNeighborsFrom0To8()
+        [TestCase(2, 2, new int[] { 0 }, new int[] { 0 }, ExpectedResult = PointState.Neighbors0)]
+        [TestCase(1, 1, new int[] {0, 0, 0}, new int[] {0, 1, 2}, ExpectedResult = PointState.Neighbors3)]
+        [TestCase(1, 1, new int[] { 0, 0, 0, 2, 2, 2 }, new int[] { 0, 1, 2, 0, 1, 2 }, ExpectedResult = PointState.Neighbors6)]
+        [TestCase(1, 1, new int[] { 0, 0, 0, 1, 1, 2, 2, 2 }, new int[] { 0, 1, 2, 0, 2, 0, 1, 2 }, ExpectedResult = PointState.Neighbors8)]
+        // [Test]
+        public PointState GetCurrentField_CountNumberOfMineNeighbors_NumberOfMineNeighborsFrom0To8(int x, int y, int[] row, int[] col)
         {
             // Precondition
+            for (int i = 0; i < row.Length; i++)
+                boolField[row[i], col[i]] = true;
             var gameProcessor = new GameProcessor(boolField);
 
             // Action
-            gameProcessor.Open(1, 1);
+            gameProcessor.Open(x, y);
             var currentField = gameProcessor.GetCurrentField();
 
             // Assert
-            Assert.AreEqual(PointState.Neighbors1, currentField[1, 1]);
-            Assert.AreEqual(PointState.Close, currentField[0, 0]);
-            Assert.AreEqual(PointState.Close, currentField[2, 2]);
+            return currentField[x, y];
+            //Assert.AreEqual(PointState.Neighbors3, currentField[x, y]);
+            //Assert.AreEqual(PointState.Close, currentField[0, 0]);
+            //Assert.AreEqual(PointState.Close, currentField[2, 2]);
 
         }
 
@@ -131,7 +137,7 @@ namespace Minesweeper.Tests
             
         }
 
-        //Negative tests
+        //Negative scenarios
         [Test]
         public void Open_InvalidCell_ShouldThrowIndexOutOfRangeException()
         {
