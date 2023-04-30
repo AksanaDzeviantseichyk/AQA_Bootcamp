@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using TreeCollection.TestModels.Enums;
 using TreeCollection.TestModels.Models;
@@ -9,6 +10,21 @@ namespace TreeCollection.Tests
 {
     public class Tests
     {
+        [Test]
+        public void Test()
+        {
+            //List<ExamResult> = new List<ExamResult>();
+            var source = new[]
+            {
+                new ExamResult(2, "John", Exams.Sharp, Score.A, DateTime.Parse("2023-06-14T13:45Z")),
+                new ExamResult(4, "Frank", Exams.Sharp, Score.B, DateTime.Parse("2023-06-15T13:45Z")),
+                new ExamResult(1, "John", Exams.English, Score.C, DateTime.Parse("2023-06-15T13:45Z")),
+                new ExamResult(5, "John", Exams.Testing, Score.D, DateTime.Parse("2023-06-15T13:45Z")),
+                new ExamResult(3, "Serhii", Exams.Sharp, Score.F, DateTime.Parse("2023-06-15T13:45Z"))
+            };
+            Array.Sort(source);
+        }
+
         [TestCase(new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, false)] // pathological tree where each parent node has only one associated child node, not reversed
         [TestCase(new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, true)] // pathological tree where each parent node has only one associated child node, reversed
         [TestCase(new int[] { 3, 4, 2, 1, 6, 7, 5, 9, 15, 12, 14, 13, 10, 0, -7, -1, -9, -2, -3, -8 }, false)] // random tree with negative and positive numbers, not reversed
