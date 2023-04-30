@@ -62,13 +62,13 @@ namespace Minesweeper.Tests
                 boolField[mineRow[i], mineCol[i]] = true;
 
             // Action
-            var gameState = Loop();
+            var gameState = OpenAllFieldsWithoutMine();
 
             // Assert
             Assert.AreEqual(GameState.Win, gameState, "Game state is not Win");
 
         }
-        public GameState Loop()
+        private GameState OpenAllFieldsWithoutMine()
         {
             var gameProcessor = new GameProcessor(boolField);
             GameState gameState = GameState.Active;
