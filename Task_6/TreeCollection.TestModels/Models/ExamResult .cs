@@ -26,8 +26,6 @@ namespace TreeCollection.TestModels.Models
             if (examResult is null) throw new ArgumentException("Impossible to compare objects");
             else
             {
-                //result = Name.CompareTo(examResult.Name);
-                  //  (result != 0) ? result : (Date.CompareTo(examResult.Date) != 0 ) ? Id.CompareTo(examResult.Id) : 0;
                 result = Name.CompareTo(examResult.Name);
                 if (result == 0) 
                 {
