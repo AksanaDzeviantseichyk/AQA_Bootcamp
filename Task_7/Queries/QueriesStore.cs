@@ -35,8 +35,7 @@ namespace Queries
             //Output the first string from A that starts with a digit and has length L.
             //If there are no required strings in the sequence A, then output the string "Not found".
             //Indication. To handle the situation associated with the absence of required rows, use the ?? operation.
-
-            throw new NotImplementedException();
+            return str.FirstOrDefault(i => char.IsDigit(i[0]) && i.Length == l) ?? "Not found";
         }
 
         public static int Query4(char c, IEnumerable<string> str)
@@ -44,7 +43,7 @@ namespace Queries
             //Query4. Given a C character and a string sequence A.
             //Find the number of A elements that contain more than one character, provided that these elements start and end with C.
 
-            throw new NotImplementedException();
+            return str.Count(i => i.Length > 1 && i[0] == c && i[i.Length-1] == c);
         }
 
         public static int Query5(IEnumerable<string> str)
@@ -52,15 +51,17 @@ namespace Queries
             //Query5. A string sequence is given.
             //Find the sum of the lengths of all strings in the given sequence.
 
-            throw new NotImplementedException();
+            return str.Sum(i => i.Length);
         }
 
         public static string Query6(IEnumerable<string> str)
         {
             //Query6. A string sequence is given.
             //Get a string consisting of the initial characters of all strings in the source sequence.
-
-            throw new NotImplementedException();
+            string result = new string(str
+                .Where(s => !string.IsNullOrEmpty(s))
+                .Select(s => s[0]).ToArray());
+            return result;
         }
 
         public static IEnumerable<int> Query7(int k, IEnumerable<int> a)
