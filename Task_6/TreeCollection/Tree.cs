@@ -2,27 +2,103 @@
 
 namespace TreeCollection
 {
-    public class Tree<T> : IEnumerable<T> 
+    public class Tree<T> : IEnumerable<T> where T : IComparable<T>
     {
-
-        public Tree(bool isReversed = false) 
+        private TreeNode<T>? root;
+        private readonly bool isReversedReading;
+        public Tree(bool isReversedReading = false) 
         {
-            throw new NotImplementedException();
+            root = null;
+            this.isReversedReading = isReversedReading;
         }
 
         public void Add(T newElement)
         {
-            throw new NotImplementedException();
+            if (root == null)
+            {
+                root = new TreeNode<T>(newElement);
+                return;
+            }
+
+            AddToNode(newElement, root);
+        }
+
+        private void AddToNode(T newElement, TreeNode<T> node)
+        {
+            int compareResult = newElement.CompareTo(node.Data);
+
+            if (compareResult < 0)
+            {
+                if (node.Left == null)
+                {
+                    node.Left = new TreeNode<T>(newElement);
+                }
+                else
+                {
+                    AddToNode(newElement, node.Left);
+                }
+            }
+            else if (compareResult > 0)
+            {
+                if (node.Right == null)
+                {
+                    node.Right = new TreeNode<T>(newElement);
+                }
+                else
+                {
+                    AddToNode(newElement, node.Right);
+                }
+            }
+            else
+            {
+                throw new Exception("New element already exists in the tree");
+            }
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            throw new NotImplementedException();
+            return isReversedReading ? ReverseTraversal(root).GetEnumerator() : InOrderTraversal(root).GetEnumerator();
+
+        }
+        private IEnumerable<T> InOrderTraversal(TreeNode<T> node)
+        {
+            if (node != null)
+            {
+                foreach (T data in InOrderTraversal(node.Left))
+                {
+                    yield return data;
+                }
+
+                yield return node.Data;
+
+                foreach (T data in InOrderTraversal(node.Right))
+                {
+                    yield return data;
+                }
+            }
+        }
+
+        private IEnumerable<T> ReverseTraversal(TreeNode<T> node)
+        {
+            if (node != null)
+            {
+                foreach (T data in ReverseTraversal(node.Right))
+                {
+                    yield return data;
+                }
+
+                yield return node.Data;
+
+                foreach (T data in ReverseTraversal(node.Left))
+                {
+                    yield return data;
+                }
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return GetEnumerator();
         }
     }
 }
