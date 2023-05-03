@@ -25,7 +25,8 @@ namespace Queries
             //There is a sequence of strings.
             //Combine all strings into one.
 
-            return str.Aggregate((a,b) => a+b);
+            return str
+                .Aggregate((a,b) => a+b);
             //return String.Join("",str);
         }
 
@@ -35,7 +36,8 @@ namespace Queries
             //Output the first string from A that starts with a digit and has length L.
             //If there are no required strings in the sequence A, then output the string "Not found".
             //Indication. To handle the situation associated with the absence of required rows, use the ?? operation.
-            return str.FirstOrDefault(i => char.IsDigit(i[0]) && i.Length == l) ?? "Not found";
+            return str
+                .FirstOrDefault(i => char.IsDigit(i[0]) && i.Length == l) ?? "Not found";
         }
 
         public static int Query4(char c, IEnumerable<string> str)
@@ -43,7 +45,8 @@ namespace Queries
             //Query4. Given a C character and a string sequence A.
             //Find the number of A elements that contain more than one character, provided that these elements start and end with C.
 
-            return str.Count(i => i.Length > 1 && i[0] == c && i[i.Length-1] == c);
+            return str
+                .Count(i => i.Length > 1 && i[0] == c && i[i.Length-1] == c);
         }
 
         public static int Query5(IEnumerable<string> str)
@@ -51,17 +54,18 @@ namespace Queries
             //Query5. A string sequence is given.
             //Find the sum of the lengths of all strings in the given sequence.
 
-            return str.Sum(i => i.Length);
+            return str
+                .Sum(i => i.Length);
         }
 
         public static string Query6(IEnumerable<string> str)
         {
             //Query6. A string sequence is given.
             //Get a string consisting of the initial characters of all strings in the source sequence.
-            string result = new string(str
+            
+            return new string(str
                 .Where(s => !string.IsNullOrEmpty(s))
-                .Select(s => s[0]).ToArray());
-            return result;
+                .Select(s => s[0]).ToArray()); ;
         }
 
         public static IEnumerable<int> Query7(int k, IEnumerable<int> a)
@@ -70,8 +74,12 @@ namespace Queries
             //Find the set-theoretic difference of two fragments A: the first contains all even numbers,
             //and the second - all numbers with ordinal numbers greater than K.
             //In the resulting sequence (not containing identical elements), reverse the order of the elements.
-
-            throw new NotImplementedException();
+                       
+            return a.Take(k)
+                .Distinct()
+                .Where(i => i % 2 == 0)
+                .Reverse()
+                .ToArray();
         }
 
         public static IEnumerable<string> Query8(int k, IEnumerable<string> a)
@@ -80,7 +88,9 @@ namespace Queries
             //Sequence strings contain only numbers and capital letters of the Latin alphabet.
             //Extract from A all strings of length K that end in a digit, sorting them in an ascending order.
 
-            throw new NotImplementedException();
+            return a
+                .Where(i => i.Length == k && char.IsDigit(i[i.Length - 1]))
+                .OrderBy(i => i);
         }
 
         public static IEnumerable<int> Query9(int d, int k, IEnumerable<int> a)
