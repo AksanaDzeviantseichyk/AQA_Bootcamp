@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -99,8 +100,14 @@ namespace Queries
             //Find the set-theoretic union of two fragments A: the first contains all elements up to the first element,
             //greater D (not including it), and the second - all elements, starting from the element with the ordinal number K.
             //Sort the resulting sequence (not containing identical elements) in descending order.
-
-            throw new NotImplementedException();
+           // int[] subres = a.TakeWhile(i => i <= d).ToArray();
+            //int[] subres1 = a.TakeLast(a.Count() - k+1).ToArray();
+            //int[] res = subres.Union(subres1).OrderByDescending(i => i).ToArray();
+            return a
+                .TakeWhile(i => i <= d)
+                .Union(a.TakeLast(a.Count() - k + 1))
+                .OrderByDescending(i => i)
+                .ToArray();
         }
 
         public static IEnumerable<string> Query10(IEnumerable<int> n)
