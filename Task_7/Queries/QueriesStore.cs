@@ -190,8 +190,13 @@ namespace Queries
             //at least one of the numbers in the sequence A), and S is the sum of all numbers from A that end in D.
             //Order the resulting sequence in an ascending order of keys.
             //Indication. Use the GroupBy method.
-
-            throw new NotImplementedException();
+            return a.GroupBy(
+                i => i % 10,
+                i => i,
+                (key, g) => new { Key = key, elements = g.ToList() })
+                .OrderBy(i => i.Key)
+                .Select(i => i.Key + ": "+ i.elements.Sum());
+            
         }
 
         public static IDictionary<uint, int> Query16(IEnumerable<Enrollee> enrollees)
