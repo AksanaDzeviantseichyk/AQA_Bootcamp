@@ -100,9 +100,7 @@ namespace Queries
             //Find the set-theoretic union of two fragments A: the first contains all elements up to the first element,
             //greater D (not including it), and the second - all elements, starting from the element with the ordinal number K.
             //Sort the resulting sequence (not containing identical elements) in descending order.
-           // int[] subres = a.TakeWhile(i => i <= d).ToArray();
-            //int[] subres1 = a.TakeLast(a.Count() - k+1).ToArray();
-            //int[] res = subres.Union(subres1).OrderByDescending(i => i).ToArray();
+           
             return a
                 .TakeWhile(i => i <= d)
                 .Union(a.TakeLast(a.Count() - k + 1))
@@ -115,7 +113,11 @@ namespace Queries
             //Query10. A sequence of positive integers is given.
             //Processing only odd numbers, get a sequence of their string representations and sort it in ascending order.
 
-            throw new NotImplementedException();
+            return n.Where(i => i % 2 != 0)
+                .Select(i => i.ToString())
+                .OrderBy(i => i)
+                .ToArray();
+            
         }
 
         public static IEnumerable<char> Query11(IEnumerable<string> str)
