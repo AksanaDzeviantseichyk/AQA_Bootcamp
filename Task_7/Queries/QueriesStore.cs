@@ -142,7 +142,7 @@ namespace Queries
             //Get a sequence containing all numbers from A greater than K1 and all numbers from B less than K2.
             //Sort the resulting sequence in ascending order.
 
-            throw new NotImplementedException();
+            return a.Where(i => i > k1).Concat(b.Where(i => i < k2)).OrderBy(i => i);
         }
 
         public static IEnumerable<string> Query13(IEnumerable<int> a, IEnumerable<int> b)
