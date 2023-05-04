@@ -128,7 +128,12 @@ namespace Queries
             //character the first character of this string is taken; otherwise, the last character of the string is taken.
             //Sort the received characters in descending order of their codes.
 
-            throw new NotImplementedException();
+            return str.Where(str => str.Length % 2 != 0)
+                .Select(s => s[0])
+                .Concat(str.Where(str => str.Length % 2 == 0)
+                .Select(s => s[s.Length - 1]))
+                .OrderByDescending(s => s)
+                .ToArray();
         }
 
         public static IEnumerable<int> Query12(int k1, int k2, IEnumerable<int> a, IEnumerable<int> b)
