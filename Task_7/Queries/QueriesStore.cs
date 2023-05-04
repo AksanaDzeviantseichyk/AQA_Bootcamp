@@ -142,7 +142,9 @@ namespace Queries
             //Get a sequence containing all numbers from A greater than K1 and all numbers from B less than K2.
             //Sort the resulting sequence in ascending order.
 
-            return a.Where(i => i > k1).Concat(b.Where(i => i < k2)).OrderBy(i => i);
+            return a.Where(i => i > k1)
+                .Concat(b.Where(i => i < k2))
+                .OrderBy(i => i);
         }
 
         public static IEnumerable<string> Query13(IEnumerable<int> a, IEnumerable<int> b)
@@ -154,8 +156,14 @@ namespace Queries
             //determined by the last digits of the original numbers.
             //Represent the found union as a sequence of strings containing the first and second elements of the pair,
             //separated by a hyphen, e.g. "49-129".
+            
+            
 
-            throw new NotImplementedException();
+            return a.Join(b,
+                i => i % 10,
+                j => j % 10,
+                (i, j) => i + " - " + j);
+            
         }
 
         public static IEnumerable<string> Query14(IEnumerable<string> a, IEnumerable<string> b)
@@ -166,8 +174,8 @@ namespace Queries
             //Represent the found union as a sequence of strings containing the first and second elements of the pair,
             //colon-separated, e.g. "AB: CD". The order of the pairs must be determined by the order
             //first elements of pairs (in ascending order), and for equal first elements - by the order of the second elements of pairs (in descending order).
-
-            throw new NotImplementedException();
+            
+            throw new NotImplementedException(); 
         }
 
         public static IEnumerable<string> Query15(IEnumerable<int> a)
