@@ -204,13 +204,13 @@ namespace Queries
             //Return a dictionary, where the key is the year, the value is the number of different schools that applicants graduated from this year.
             //Order the elements of the dictionary in ascending order of the number of schools, and for matching numbers - in ascending order of the year number.
 
-            //return enrollees.GroupBy(
-            // i => i.YearGraduate,
-            //i => i.SchoolNumber,
-            //(key, g) => new { YearGraduate = key, CountSchool = g.Count() })
-            // .OrderBy(i => i.Key)
-            // .Select(i => i.Key + ": " + i.elements.Sum());
-            return null;
+            return enrollees.GroupBy(
+                i => i.YearGraduate,
+                i => i.SchoolNumber,
+                (key, g) => new  { YearGraduate = key, CountSchool = g.Count() })
+                .OrderBy(i => i.CountSchool)
+                .ThenBy(i => i.YearGraduate)
+                .ToDictionary(i => i.YearGraduate, i => i.CountSchool);           
         }
     }
 }
