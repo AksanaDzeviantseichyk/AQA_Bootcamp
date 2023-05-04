@@ -26,9 +26,11 @@ namespace Queries
             //There is a sequence of strings.
             //Combine all strings into one.
 
+            //return String.Join("",str);
+
             return str
                 .Aggregate((a,b) => a+b);
-            //return String.Join("",str);
+            
         }
 
         public static string Query3(int l, IEnumerable<string> str)
@@ -37,8 +39,8 @@ namespace Queries
             //Output the first string from A that starts with a digit and has length L.
             //If there are no required strings in the sequence A, then output the string "Not found".
             //Indication. To handle the situation associated with the absence of required rows, use the ?? operation.
-            return str
-                .FirstOrDefault(i => char.IsDigit(i[0]) && i.Length == l) ?? "Not found";
+        
+            return str.FirstOrDefault(i => char.IsDigit(i[0]) && i.Length == l) ?? "Not found";
         }
 
         public static int Query4(char c, IEnumerable<string> str)
@@ -46,8 +48,7 @@ namespace Queries
             //Query4. Given a C character and a string sequence A.
             //Find the number of A elements that contain more than one character, provided that these elements start and end with C.
 
-            return str
-                .Count(i => i.Length > 1 && i[0] == c && i[i.Length-1] == c);
+            return str.Count(i => i.Length > 1 && i[0] == c && i[i.Length-1] == c);
         }
 
         public static int Query5(IEnumerable<string> str)
@@ -55,8 +56,7 @@ namespace Queries
             //Query5. A string sequence is given.
             //Find the sum of the lengths of all strings in the given sequence.
 
-            return str
-                .Sum(i => i.Length);
+            return str.Sum(i => i.Length);
         }
 
         public static string Query6(IEnumerable<string> str)
@@ -64,9 +64,9 @@ namespace Queries
             //Query6. A string sequence is given.
             //Get a string consisting of the initial characters of all strings in the source sequence.
             
-            return new string(str
-                .Where(s => !string.IsNullOrEmpty(s))
-                .Select(s => s[0]).ToArray()); ;
+            return new string(str.Where(s => !string.IsNullOrEmpty(s))
+                .Select(s => s[0])
+                .ToArray()); ;
         }
 
         public static IEnumerable<int> Query7(int k, IEnumerable<int> a)
@@ -89,8 +89,7 @@ namespace Queries
             //Sequence strings contain only numbers and capital letters of the Latin alphabet.
             //Extract from A all strings of length K that end in a digit, sorting them in an ascending order.
 
-            return a
-                .Where(i => i.Length == k && char.IsDigit(i[i.Length - 1]))
+            return a.Where(i => i.Length == k && char.IsDigit(i[i.Length - 1]))
                 .OrderBy(i => i);
         }
 
@@ -101,8 +100,7 @@ namespace Queries
             //greater D (not including it), and the second - all elements, starting from the element with the ordinal number K.
             //Sort the resulting sequence (not containing identical elements) in descending order.
            
-            return a
-                .TakeWhile(i => i <= d)
+            return a.TakeWhile(i => i <= d)
                 .Union(a.TakeLast(a.Count() - k + 1))
                 .OrderByDescending(i => i)
                 .ToArray();
@@ -190,13 +188,13 @@ namespace Queries
             //at least one of the numbers in the sequence A), and S is the sum of all numbers from A that end in D.
             //Order the resulting sequence in an ascending order of keys.
             //Indication. Use the GroupBy method.
+
             return a.GroupBy(
                 i => i % 10,
                 i => i,
-                (key, g) => new { Key = key, elements = g.ToList() })
-                .OrderBy(i => i.Key)
-                .Select(i => i.Key + ": "+ i.elements.Sum());
-            
+                (key, g) => new { D = key, S = g.Sum() })
+                .OrderBy(i => i.D)
+                .Select(i => i.D + ": "+ i.S);
         }
 
         public static IDictionary<uint, int> Query16(IEnumerable<Enrollee> enrollees)
@@ -206,7 +204,13 @@ namespace Queries
             //Return a dictionary, where the key is the year, the value is the number of different schools that applicants graduated from this year.
             //Order the elements of the dictionary in ascending order of the number of schools, and for matching numbers - in ascending order of the year number.
 
-            throw new NotImplementedException();
+            //return enrollees.GroupBy(
+            // i => i.YearGraduate,
+            //i => i.SchoolNumber,
+            //(key, g) => new { YearGraduate = key, CountSchool = g.Count() })
+            // .OrderBy(i => i.Key)
+            // .Select(i => i.Key + ": " + i.elements.Sum());
+            return null;
         }
     }
 }
