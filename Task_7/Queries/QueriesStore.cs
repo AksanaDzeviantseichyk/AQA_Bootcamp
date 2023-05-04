@@ -157,13 +157,10 @@ namespace Queries
             //Represent the found union as a sequence of strings containing the first and second elements of the pair,
             //separated by a hyphen, e.g. "49-129".
             
-            
-
             return a.Join(b,
                 i => i % 10,
                 j => j % 10,
                 (i, j) => i + " - " + j);
-            
         }
 
         public static IEnumerable<string> Query14(IEnumerable<string> a, IEnumerable<string> b)
@@ -175,7 +172,14 @@ namespace Queries
             //colon-separated, e.g. "AB: CD". The order of the pairs must be determined by the order
             //first elements of pairs (in ascending order), and for equal first elements - by the order of the second elements of pairs (in descending order).
             
-            throw new NotImplementedException(); 
+            return a.Join(b,
+                i => i.Length,
+                j => j.Length,
+                (i, j) => new { first = i, second = j })
+                .OrderBy(i => i.first)
+                .ThenByDescending(i => i.second)
+                .Select(i => i.first + ":" + i.second)
+                .ToArray();
         }
 
         public static IEnumerable<string> Query15(IEnumerable<int> a)
