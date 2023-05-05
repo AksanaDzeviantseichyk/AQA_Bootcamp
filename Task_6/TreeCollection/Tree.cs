@@ -51,7 +51,7 @@ namespace TreeCollection
             }
             else
             {
-                throw new Exception("New element already exists in the tree");
+                throw new ArgumentException("New element already exists in the tree");
             }
         }
 
