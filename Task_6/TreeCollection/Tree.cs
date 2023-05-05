@@ -57,10 +57,18 @@ namespace TreeCollection
 
         public IEnumerator<T> GetEnumerator()
         {
-            return isReversedReading ? ReverseTraversal(root).GetEnumerator() : InOrderTraversal(root).GetEnumerator();
+            return isReversedReading ? 
+                ReverseTraversal(root).GetEnumerator() 
+                : InOrderTraversal(root).GetEnumerator();
 
         }
-        private IEnumerable<T> InOrderTraversal(TreeNode<T> node)
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        private IEnumerable<T> InOrderTraversal(TreeNode<T>? node)
         {
             if (node != null)
             {
@@ -78,7 +86,7 @@ namespace TreeCollection
             }
         }
 
-        private IEnumerable<T> ReverseTraversal(TreeNode<T> node)
+        private IEnumerable<T> ReverseTraversal(TreeNode<T>? node)
         {
             if (node != null)
             {
@@ -95,10 +103,6 @@ namespace TreeCollection
                 }
             }
         }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        
     }
 }
