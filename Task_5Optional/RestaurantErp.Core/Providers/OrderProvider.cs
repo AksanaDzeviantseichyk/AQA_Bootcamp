@@ -116,12 +116,12 @@ namespace RestaurantErp.Core.Providers
             };
 
             var discounts = _discountProviders.Select(i => i.Calculate(targetOrder));
-
+            
             _discountCalculator.ApplyDiscount(bill, discounts);
             _serviceChargeProvider.ApplyServiceCharge(bill);
 
             var publicBill = _billHelper.GetExternalBill(bill);
-
+            
             return publicBill;
         }
 

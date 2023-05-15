@@ -1,4 +1,5 @@
 using FluentAssertions;
+using FluentAssertions.Common;
 using NUnit.Framework;
 using RestaurantErp.Core.Contracts;
 using RestaurantErp.Core.Helpers;
@@ -15,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Threading;
 
 namespace Restaurant.Tests
 {
@@ -46,11 +48,11 @@ namespace Restaurant.Tests
             productProvider = new ProductProvider();
             discountManager = new DiscountByTimeProvider(new DiscountByTimeProviderSettings
             {
-                EndDiscountDelay = TimeSpan.FromSeconds(50)
-            });
+                EndDiscountDelay = TimeSpan.Zero
+            }) ;
             calculator = new DiscountCalculator(new DiscountCalculatorSettings
             {
-                MinimalProductPrice = 0.2m
+                MinimalProductPrice = 0
             });
 
             orderProvider = new OrderProvider(
@@ -60,12 +62,131 @@ namespace Restaurant.Tests
                 new TimeHelper(),
                 new BillHelper(productProvider),
                 new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
+        }
+
+        [Test]
+        public void Checkout_ServiseCharge()
+        {
+
+        }
+
+        [Test]
+        public void Checkout_Discount()
+        {
+            
+            var requestProduct1 = new AddProductRequest
+            {
+                Name = "Drink",
+                Price = 4
+            };
+            var requestProduct2 = new AddProductRequest
+            {
+                Name = "Main",
+                Price = 5
+            };
+            var productId1 = productProvider.AddProduct(requestProduct1);
+            var productId2 = productProvider.AddProduct(requestProduct2);
+
+            discountManager.Add(new DiscountByTimeSettings
+            {
+                ProductId = productId1,
+                StartTime = TimeOnly.FromDateTime(DateTime.UtcNow),
+                EndTime = TimeOnly.FromDateTime(DateTime.UtcNow).AddMinutes(1),
+                DiscountValue = 0.1m
+            }) ;
+            orderProvider = new OrderProvider(
+                (IPriceStorage)productProvider,
+                new[] { (IDiscountProvider)discountManager },
+                calculator,
+                new TimeHelper(),
+                new BillHelper(productProvider),
+                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
+
+            var orderId = orderProvider.CreateOrder();
+           
+            orderProvider.AddItem(new OrderItemRequest
+            {
+                OrderId = orderId,
+                Count = 1,
+                ProductId = productId1
+            });
+
+            orderProvider.AddItem(new OrderItemRequest
+            {
+                OrderId = orderId,
+                Count = 1,
+                ProductId = productId2
+            });
+            Thread.Sleep(70000);
+
+            orderProvider.AddItem(new OrderItemRequest
+            {
+                OrderId = orderId,
+                Count = 1,
+                ProductId = productId1
+            });
+            orderProvider.AddItem(new OrderItemRequest
+            {
+                OrderId = orderId,
+                Count = 1,
+                ProductId = productId2
+            });
+            var actual = orderProvider.Checkout(orderId);
+            //Assert
+
+            var expected = new BillExternal
+            {
+                Amount = 18,
+                AmountDiscounted = 17.6m,
+                Discount = 0.4m,
+                OrderId = orderId,
+                Service = 1.76m,
+                Total = 19.36m,
+                Items = new[]
+                {
+                    new BillItemExternal
+                    {
+                        Amount = 4,
+                        Discount = 0.4m,
+                        AmountDiscounted = 3.6m,
+                        PersonId = 0,
+                        ProductName = requestProduct1.Name
+                    },
+                    new BillItemExternal
+                    {
+                        Amount = 5,
+                        Discount = 0,
+                        AmountDiscounted = 5,
+                        PersonId = 0,
+                        ProductName = requestProduct2.Name
+                    },
+                    new BillItemExternal
+                    {
+                        Amount = 4,
+                        Discount = 0,
+                        AmountDiscounted = 4,
+                        PersonId = 0,
+                        ProductName = requestProduct1.Name
+                    },
+                    new BillItemExternal
+                    {
+                        Amount = 5,
+                        Discount = 0,
+                        AmountDiscounted = 5,
+                        PersonId = 0,
+                        ProductName = requestProduct2.Name
+                    }
+                }
+            };
+
+            actual.Should().BeEquivalentTo(expected);
 
         }
 
         [Test]
         public void Checkout_AllBillExternal_()
         {
+                        
             // Precondition
 
 
@@ -94,7 +215,7 @@ namespace Restaurant.Tests
             // Action
 
             var orderId = orderProvider.CreateOrder();
-
+            
             orderProvider.AddItem(new OrderItemRequest
             {
                 OrderId = orderId,
@@ -115,10 +236,40 @@ namespace Restaurant.Tests
                 Count = 1,
                 ProductId = productId3
             });
-
+            var expectedAmount = requestProduct1.Price + requestProduct2.Price + requestProduct3.Price;
+            var expectedService = 0.1m*(requestProduct1.Price + requestProduct2.Price + requestProduct3.Price);
+            var expectedTotal = expectedAmount + expectedService;
             var actual = orderProvider.Checkout(orderId);
-            Console.WriteLine($"{actual.Amount}, {actual.Discount}, {actual.AmountDiscounted}, {actual.Service}, {actual.Total}, {actual.Items.ToString()}");
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(orderId, actual.OrderId);
+                Assert.AreEqual(expectedAmount, actual.Amount);
+                Assert.AreEqual(0, actual.Discount);
+                Assert.AreEqual(expectedAmount, actual.AmountDiscounted);
+                Assert.AreEqual(expectedService, actual.Service);
+                Assert.AreEqual(expectedTotal, actual.Total);
 
+                var item1 = actual.Items.Single(i => i.ProductName == requestProduct1.Name);
+                Assert.AreEqual(requestProduct1.Name, item1.ProductName);
+                Assert.AreEqual(requestProduct1.Price, item1.Amount);
+                Assert.AreEqual(0, item1.PersonId);
+                Assert.AreEqual(0, item1.Discount);
+                Assert.AreEqual(requestProduct1.Price, item1.AmountDiscounted);
+
+                var item2 = actual.Items.Single(i => i.ProductName == requestProduct2.Name);
+                Assert.AreEqual(requestProduct2.Name, item2.ProductName);
+                Assert.AreEqual(requestProduct2.Price, item2.Amount);
+                Assert.AreEqual(0, item2.PersonId);
+                Assert.AreEqual(0, item2.Discount);
+                Assert.AreEqual(requestProduct2.Price, item2.AmountDiscounted);
+
+                var item3 = actual.Items.Single(i => i.ProductName == requestProduct3.Name);
+                Assert.AreEqual(requestProduct3.Name, item3.ProductName);
+                Assert.AreEqual(requestProduct3.Price, item3.Amount);
+                Assert.AreEqual(0, item3.PersonId);
+                Assert.AreEqual(0, item3.Discount);
+                Assert.AreEqual(requestProduct3.Price, item3.AmountDiscounted);
+            });
         }
 
         [TestCase(1)]
