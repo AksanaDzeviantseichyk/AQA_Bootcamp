@@ -55,19 +55,49 @@ namespace Restaurant.Tests
                 MinimalProductPrice = 0
             });
 
-            orderProvider = new OrderProvider(
+       }
+
+        [TestCase(0, 0)]
+        [TestCase(0.1, 0.4)]
+        [TestCase(0.2, 0.8)]
+        [TestCase(0.3, 1.2)]
+        [TestCase(0.4, 1.6)]
+        [TestCase(0.5, 2)]
+        [TestCase(0.6, 2.4)]
+        [TestCase(0.7, 2.8)]
+        [TestCase(0.8, 3.2)]
+        [TestCase(0.9, 3.6)]
+        [TestCase(1, 4)]
+        public void Checkout_ServiseCharge(decimal serviceRate, decimal expectedServiceCharge)
+        {
+            var orderProvider = new OrderProvider(
                 (IPriceStorage)productProvider,
                 new[] { (IDiscountProvider)discountManager },
                 calculator,
                 new TimeHelper(),
                 new BillHelper(productProvider),
-                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
-        }
+                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = serviceRate }));
 
-        [Test]
-        public void Checkout_ServiseCharge()
-        {
+            var requestProduct1 = new AddProductRequest
+            {
+                Name = "Drink",
+                Price = 4
+            };
+            var productId1 = productProvider.AddProduct(requestProduct1);
+            
+            
+            var orderId = orderProvider.CreateOrder();
 
+            orderProvider.AddItem(new OrderItemRequest
+            {
+                OrderId = orderId,
+                Count = 1,
+                ProductId = productId1
+            });
+
+            var actualServiceCharge = orderProvider.Checkout(orderId).Service;
+            Assert.AreEqual(expectedServiceCharge, actualServiceCharge);
+            
         }
 
         [Test]
@@ -211,7 +241,13 @@ namespace Restaurant.Tests
             var productId1 = productProvider.AddProduct(requestProduct1);
             var productId2 = productProvider.AddProduct(requestProduct2);
             var productId3 = productProvider.AddProduct(requestProduct3);
-
+            orderProvider = new OrderProvider(
+                (IPriceStorage)productProvider,
+                new[] { (IDiscountProvider)discountManager },
+                calculator,
+                new TimeHelper(),
+                new BillHelper(productProvider),
+                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
             // Action
 
             var orderId = orderProvider.CreateOrder();
@@ -306,6 +342,13 @@ namespace Restaurant.Tests
         {
             //Precondition
             var productId1 = productProvider.AddProduct(requestProduct);
+            orderProvider = new OrderProvider(
+                (IPriceStorage)productProvider,
+                new[] { (IDiscountProvider)discountManager },
+                calculator,
+                new TimeHelper(),
+                new BillHelper(productProvider),
+                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
             var orderId = orderProvider.CreateOrder();
             var orderItemRequest = new OrderItemRequest
             {
@@ -334,6 +377,13 @@ namespace Restaurant.Tests
         {
             //Precondition         
             var productId1 = productProvider.AddProduct(requestProduct);
+            orderProvider = new OrderProvider(
+                (IPriceStorage)productProvider,
+                new[] { (IDiscountProvider)discountManager },
+                calculator,
+                new TimeHelper(),
+                new BillHelper(productProvider),
+                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
             var orderId = orderProvider.CreateOrder();
             var orderItemRequest = new OrderItemRequest
             {
@@ -367,6 +417,13 @@ namespace Restaurant.Tests
         {
             //Precondition
             var productId1 = productProvider.AddProduct(requestProduct);
+            orderProvider = new OrderProvider(
+                (IPriceStorage)productProvider,
+                new[] { (IDiscountProvider)discountManager },
+                calculator,
+                new TimeHelper(),
+                new BillHelper(productProvider),
+                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
             var orderId = orderProvider.CreateOrder();
             var orderItemRequest = new OrderItemRequest
             {
@@ -404,6 +461,13 @@ namespace Restaurant.Tests
             var productId2 = productProvider.AddProduct(requestProduct2);
 
             // Action
+            orderProvider = new OrderProvider(
+                (IPriceStorage)productProvider,
+                new[] { (IDiscountProvider)discountManager },
+                calculator,
+                new TimeHelper(),
+                new BillHelper(productProvider),
+                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
 
             var orderId = orderProvider.CreateOrder();
 
@@ -485,6 +549,13 @@ namespace Restaurant.Tests
             var productId3 = productProvider.AddProduct(requestProduct3);
 
             // Action
+            orderProvider = new OrderProvider(
+                (IPriceStorage)productProvider,
+                new[] { (IDiscountProvider)discountManager },
+                calculator,
+                new TimeHelper(),
+                new BillHelper(productProvider),
+                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
 
             var orderId = orderProvider.CreateOrder();
 
@@ -653,6 +724,13 @@ namespace Restaurant.Tests
             var productId3 = productProvider.AddProduct(requestProduct3);
 
             // Action
+            orderProvider = new OrderProvider(
+                (IPriceStorage)productProvider,
+                new[] { (IDiscountProvider)discountManager },
+                calculator,
+                new TimeHelper(),
+                new BillHelper(productProvider),
+                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
 
             var orderId = orderProvider.CreateOrder();
 
