@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FluentAssertions.Common;
 using NUnit.Framework;
+using Restaurant.Tests.Utils;
 using RestaurantErp.Core.Contracts;
 using RestaurantErp.Core.Helpers;
 using RestaurantErp.Core.Models;
@@ -17,45 +18,123 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
+using System.Xml.Linq;
 
 namespace Restaurant.Tests
 {
     public class OrderProviderTests
     {
-        private ProductProvider productProvider;
-        private IDiscountByTimeProvider discountManager;
-        private IDiscountCalculator calculator;
-        private IOrderProvider orderProvider;
+        private ProductProvider _productProvider;
+        private IDiscountByTimeProvider _discountManager;
+        private IDiscountCalculator _calculator;
+        private readonly AddProductRequestGenerator _addProductRequest = new AddProductRequestGenerator();
+        private readonly OrderItemRequestGenerator _orderItemRequest = new OrderItemRequestGenerator();
+        private readonly OrderProviderGenerator _orderProvider = new OrderProviderGenerator();
 
         private static IEnumerable<TestCaseData> AddItemsGenerator()
         {
-            yield return new TestCaseData(new AddProductRequest{Name = "Starter",Price = 3},3);
-            yield return new TestCaseData(new AddProductRequest{Name = "Starter",Price = 4},4);
+            AddProductRequestGenerator _addProductRequest = new AddProductRequestGenerator();
+            yield return new TestCaseData(_addProductRequest.GenerateAddProductRequest("Starter", 3), 3);
+            yield return new TestCaseData(_addProductRequest.GenerateAddProductRequest("Starter", 4), 4);
         }
         private static IEnumerable<TestCaseData> CancelItemsGenerator()
         {
-            yield return new TestCaseData(new AddProductRequest{Name = "Starter",Price = 3}, 4, 1);
-            yield return new TestCaseData(new AddProductRequest{Name = "Starter",Price = 4}, 5, 5);
+            AddProductRequestGenerator _addProductRequest = new AddProductRequestGenerator();
+            yield return new TestCaseData(_addProductRequest.GenerateAddProductRequest("Starter", 3), 4, 1);
+            yield return new TestCaseData(_addProductRequest.GenerateAddProductRequest("Starter", 4), 5, 5);
         }
         private static IEnumerable<TestCaseData> IncorrectCancelItemCountGenerator()
         {
-            yield return new TestCaseData(new AddProductRequest{Name = "Starter", Price = 3},3, 5);
+            AddProductRequestGenerator _addProductRequest = new AddProductRequestGenerator();
+            yield return new TestCaseData(_addProductRequest.GenerateAddProductRequest("Starter", 3), 3, 5);
         }
 
         [SetUp]
         public void SetUp()
         {
-            productProvider = new ProductProvider();
-            discountManager = new DiscountByTimeProvider(new DiscountByTimeProviderSettings
+            _productProvider = new ProductProvider();
+            _discountManager = new DiscountByTimeProvider(new DiscountByTimeProviderSettings
             {
                 EndDiscountDelay = TimeSpan.Zero
             }) ;
-            calculator = new DiscountCalculator(new DiscountCalculatorSettings
+            _calculator = new DiscountCalculator(new DiscountCalculatorSettings
             {
                 MinimalProductPrice = 0
             });
 
        }
+        [Test]
+        public void Checkout_Integration()
+        {
+            var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Drink", 4);
+            var productId1 = _productProvider.AddProduct(requestProduct1);
+            _discountManager.Add(new DiscountByTimeSettings
+            {
+                ProductId = productId1,
+                StartTime = TimeOnly.FromDateTime(DateTime.UtcNow),
+                EndTime = TimeOnly.FromDateTime(DateTime.UtcNow).AddMinutes(1),
+                DiscountValue = 0.1m
+            });
+            var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
+
+            var orderId = orderProvider.CreateOrder();
+                     
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 2, productId1));
+            
+            Thread.Sleep(70000);
+
+            orderProvider.CancelItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 2, productId1)); 
+            
+            var actual = orderProvider.Checkout(orderId);
+            var expected = new BillExternal
+            {
+                Amount = 16,
+                AmountDiscounted = 15.2m,
+                Discount = 0.8m,
+                OrderId = orderId,
+                Service = 1.52m,
+                Total = 16.72m,
+                Items = new[]
+                {
+                    new BillItemExternal
+                    {
+                        Amount = 4,
+                        Discount = 0.4m,
+                        AmountDiscounted = 3.6m,
+                        PersonId = 0,
+                        ProductName = requestProduct1.Name
+                    },
+                    new BillItemExternal
+                    {
+                        Amount = 4,
+                        Discount = 0.4m,
+                        AmountDiscounted = 3.6m,
+                        PersonId = 0,
+                        ProductName = requestProduct1.Name
+                    },
+                    new BillItemExternal
+                    {
+                        Amount = 4,
+                        Discount = 0,
+                        AmountDiscounted = 4,
+                        PersonId = 0,
+                        ProductName = requestProduct1.Name
+                    },
+                    new BillItemExternal
+                    {
+                        Amount = 4,
+                        Discount = 0,
+                        AmountDiscounted = 4,
+                        PersonId = 0,
+                        ProductName = requestProduct1.Name
+                    }
+                }
+            };
+
+            actual.Should().BeEquivalentTo(expected);
+
+        }
 
         [TestCase(0, 0)]
         [TestCase(0.1, 0.4)]
@@ -70,97 +149,42 @@ namespace Restaurant.Tests
         [TestCase(1, 4)]
         public void Checkout_ServiseCharge(decimal serviceRate, decimal expectedServiceCharge)
         {
-            var orderProvider = new OrderProvider(
-                (IPriceStorage)productProvider,
-                new[] { (IDiscountProvider)discountManager },
-                calculator,
-                new TimeHelper(),
-                new BillHelper(productProvider),
-                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = serviceRate }));
-
-            var requestProduct1 = new AddProductRequest
-            {
-                Name = "Drink",
-                Price = 4
-            };
-            var productId1 = productProvider.AddProduct(requestProduct1);
-            
-            
+            var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, serviceRate);
+            var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Drink", 4);
+            var productId1 = _productProvider.AddProduct(requestProduct1);
             var orderId = orderProvider.CreateOrder();
-
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId1
-            });
-
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
             var actualServiceCharge = orderProvider.Checkout(orderId).Service;
             Assert.AreEqual(expectedServiceCharge, actualServiceCharge);
-            
         }
 
         [Test]
         public void Checkout_Discount()
         {
             
-            var requestProduct1 = new AddProductRequest
-            {
-                Name = "Drink",
-                Price = 4
-            };
-            var requestProduct2 = new AddProductRequest
-            {
-                Name = "Main",
-                Price = 5
-            };
-            var productId1 = productProvider.AddProduct(requestProduct1);
-            var productId2 = productProvider.AddProduct(requestProduct2);
+            var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Drink", 4);
+            var requestProduct2 = _addProductRequest.GenerateAddProductRequest("Main", 5);
+            var productId1 = _productProvider.AddProduct(requestProduct1);
+            var productId2 = _productProvider.AddProduct(requestProduct2);
 
-            discountManager.Add(new DiscountByTimeSettings
+            _discountManager.Add(new DiscountByTimeSettings
             {
                 ProductId = productId1,
                 StartTime = TimeOnly.FromDateTime(DateTime.UtcNow),
                 EndTime = TimeOnly.FromDateTime(DateTime.UtcNow).AddMinutes(1),
                 DiscountValue = 0.1m
             }) ;
-            orderProvider = new OrderProvider(
-                (IPriceStorage)productProvider,
-                new[] { (IDiscountProvider)discountManager },
-                calculator,
-                new TimeHelper(),
-                new BillHelper(productProvider),
-                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
+            var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
 
             var orderId = orderProvider.CreateOrder();
            
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId1
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
 
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId2
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
             Thread.Sleep(70000);
 
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId1
-            });
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId2
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
             var actual = orderProvider.Checkout(orderId);
             //Assert
 
@@ -220,58 +244,25 @@ namespace Restaurant.Tests
             // Precondition
 
 
-            var requestProduct1 = new AddProductRequest
-            {
-                Name = "Starter",
-                Price = 4
-            };
+            var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Starter", 4);
 
-            var requestProduct2 = new AddProductRequest
-            {
-                Name = "Main",
-                Price = 7
-            };
+            var requestProduct2 = _addProductRequest.GenerateAddProductRequest("Main", 7);
 
-            var requestProduct3 = new AddProductRequest
-            {
-                Name = "Drink",
-                Price = 2.5m
-            };
+            var requestProduct3 = _addProductRequest.GenerateAddProductRequest("Drink", 2.5m);
 
-            var productId1 = productProvider.AddProduct(requestProduct1);
-            var productId2 = productProvider.AddProduct(requestProduct2);
-            var productId3 = productProvider.AddProduct(requestProduct3);
-            orderProvider = new OrderProvider(
-                (IPriceStorage)productProvider,
-                new[] { (IDiscountProvider)discountManager },
-                calculator,
-                new TimeHelper(),
-                new BillHelper(productProvider),
-                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
+            var productId1 = _productProvider.AddProduct(requestProduct1);
+            var productId2 = _productProvider.AddProduct(requestProduct2);
+            var productId3 = _productProvider.AddProduct(requestProduct3);
+            var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
             // Action
 
             var orderId = orderProvider.CreateOrder();
             
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId1
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1)); 
 
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId2
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
 
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId3
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId3));
             var expectedAmount = requestProduct1.Price + requestProduct2.Price + requestProduct3.Price;
             var expectedService = 0.1m*(requestProduct1.Price + requestProduct2.Price + requestProduct3.Price);
             var expectedTotal = expectedAmount + expectedService;
@@ -310,16 +301,10 @@ namespace Restaurant.Tests
 
         [TestCase(1)]
         [TestCase(4)]
-        public void CreateOrder_SomeOrderInOrderStarage_CountOrderIsCorrect(int count)
+        public void CreateOrder_SomeOrderInOrderStorage_CountOrderIsCorrect(int count)
         {
             // Precondition
-            var orderProvider = new OrderProvider(
-                (IPriceStorage)productProvider,
-                new[] { (IDiscountProvider)discountManager },
-                calculator,
-                new TimeHelper(),
-                new BillHelper(productProvider),
-                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
+            var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
 
             // Action
             for (int _ = 1; _ <= count; _++)
@@ -341,24 +326,11 @@ namespace Restaurant.Tests
         public void AddItem_SomeItemInOrder_ItemCountInOrderIsCorrect(AddProductRequest requestProduct, int count)
         {
             //Precondition
-            var productId1 = productProvider.AddProduct(requestProduct);
-            orderProvider = new OrderProvider(
-                (IPriceStorage)productProvider,
-                new[] { (IDiscountProvider)discountManager },
-                calculator,
-                new TimeHelper(),
-                new BillHelper(productProvider),
-                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
+            var productId1 = _productProvider.AddProduct(requestProduct);
+            var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
             var orderId = orderProvider.CreateOrder();
-            var orderItemRequest = new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = count,
-                ProductId = productId1
-            };
-
             //Action
-            orderProvider.AddItem(orderItemRequest);
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, count, productId1));
             var _orderStorageField = typeof(OrderProvider)
                 .GetField("_orderStorage", BindingFlags.Instance | BindingFlags.NonPublic);
             var orderStorage = (ConcurrentBag<Order>)_orderStorageField.GetValue(orderProvider);
@@ -376,30 +348,14 @@ namespace Restaurant.Tests
         public void CancelItem_FromOrder_ItemCountInOrderIsCorrect(AddProductRequest requestProduct, int addCount, int cancelCount)
         {
             //Precondition         
-            var productId1 = productProvider.AddProduct(requestProduct);
-            orderProvider = new OrderProvider(
-                (IPriceStorage)productProvider,
-                new[] { (IDiscountProvider)discountManager },
-                calculator,
-                new TimeHelper(),
-                new BillHelper(productProvider),
-                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
+            var productId1 = _productProvider.AddProduct(requestProduct);
+            var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
             var orderId = orderProvider.CreateOrder();
-            var orderItemRequest = new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = addCount,
-                ProductId = productId1
-            };
-            orderProvider.AddItem(orderItemRequest);
+            
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, addCount, productId1));
 
             //Action
-            orderProvider.CancelItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = cancelCount,
-                ProductId = productId1
-            });
+            orderProvider.CancelItem(_orderItemRequest.GenerateOrderItemRequest(orderId, cancelCount, productId1));
             var _orderStorageField = typeof(OrderProvider)
                 .GetField("_orderStorage", BindingFlags.Instance | BindingFlags.NonPublic);
             var orderStorage = (ConcurrentBag<Order>)_orderStorageField.GetValue(orderProvider);
@@ -416,30 +372,15 @@ namespace Restaurant.Tests
         public void CancelItem_IncorrectCancelItemCount_ShouldThrowArgumentOutOfRangeException(AddProductRequest requestProduct, int addCount, int cancelCount)
         {
             //Precondition
-            var productId1 = productProvider.AddProduct(requestProduct);
-            orderProvider = new OrderProvider(
-                (IPriceStorage)productProvider,
-                new[] { (IDiscountProvider)discountManager },
-                calculator,
-                new TimeHelper(),
-                new BillHelper(productProvider),
-                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
+            var productId1 = _productProvider.AddProduct(requestProduct);
+            var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
             var orderId = orderProvider.CreateOrder();
-            var orderItemRequest = new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = addCount,
-                ProductId = productId1
-            };
-            orderProvider.AddItem(orderItemRequest);
-            var orderItemRequest1 = new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = cancelCount,
-                ProductId = productId1
-            };
+            
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, addCount, productId1));
+            
             //Action-Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => orderProvider.CancelItem(orderItemRequest1));
+            Assert.Throws<ArgumentOutOfRangeException>(() => orderProvider.CancelItem(
+                _orderItemRequest.GenerateOrderItemRequest(orderId, cancelCount, productId1)));
 
         }
 
@@ -447,43 +388,19 @@ namespace Restaurant.Tests
         public void Ckeckout_TwoProductsInOrder_AmountIsCorrect()
         {
             // Precondition
-            var requestProduct1 = new AddProductRequest
-            {
-                Name = "Starter",
-                Price = 4
-            };
-            var requestProduct2 = new AddProductRequest
-            {
-                Name = "Main",
-                Price = 7
-            };
-            var productId1 = productProvider.AddProduct(requestProduct1);
-            var productId2 = productProvider.AddProduct(requestProduct2);
+            var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Starter", 4);
+            var requestProduct2 = _addProductRequest.GenerateAddProductRequest("Main", 7);
+            var productId1 = _productProvider.AddProduct(requestProduct1);
+            var productId2 = _productProvider.AddProduct(requestProduct2);
 
             // Action
-            orderProvider = new OrderProvider(
-                (IPriceStorage)productProvider,
-                new[] { (IDiscountProvider)discountManager },
-                calculator,
-                new TimeHelper(),
-                new BillHelper(productProvider),
-                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
+            var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
 
             var orderId = orderProvider.CreateOrder();
 
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId1
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
 
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId2
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
 
             var actual = orderProvider.Checkout(orderId);
 
@@ -526,59 +443,26 @@ namespace Restaurant.Tests
             // Precondition
 
 
-            var requestProduct1 = new AddProductRequest
-            {
-                Name = "Starter",
-                Price = 4
-            };
+            var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Starter", 4);
 
-            var requestProduct2 = new AddProductRequest
-            {
-                Name = "Main",
-                Price = 7
-            };
+            var requestProduct2 = _addProductRequest.GenerateAddProductRequest("Main", 7);
 
-            var requestProduct3 = new AddProductRequest
-            {
-                Name = "Drink",
-                Price = 2.5m
-            };
+            var requestProduct3 = _addProductRequest.GenerateAddProductRequest("Drink", 2.5m);
 
-            var productId1 = productProvider.AddProduct(requestProduct1);
-            var productId2 = productProvider.AddProduct(requestProduct2);
-            var productId3 = productProvider.AddProduct(requestProduct3);
+            var productId1 = _productProvider.AddProduct(requestProduct1);
+            var productId2 = _productProvider.AddProduct(requestProduct2);
+            var productId3 = _productProvider.AddProduct(requestProduct3);
 
             // Action
-            orderProvider = new OrderProvider(
-                (IPriceStorage)productProvider,
-                new[] { (IDiscountProvider)discountManager },
-                calculator,
-                new TimeHelper(),
-                new BillHelper(productProvider),
-                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
+            var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
 
             var orderId = orderProvider.CreateOrder();
 
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 4,
-                ProductId = productId1
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId1));
 
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 4,
-                ProductId = productId2
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId2));
 
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 4,
-                ProductId = productId3
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId3));
 
             var actual = orderProvider.Checkout(orderId);
 
@@ -701,81 +585,30 @@ namespace Restaurant.Tests
         {
             // Precondition
 
-            var requestProduct1 = new AddProductRequest
-            {
-                Name = "Starter",
-                Price = 4
-            };
+            var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Starter", 4);
+            var requestProduct2 = _addProductRequest.GenerateAddProductRequest("Main", 7);
+            var requestProduct3 = _addProductRequest.GenerateAddProductRequest("Drink", 2.5m);
 
-            var requestProduct2 = new AddProductRequest
-            {
-                Name = "Main",
-                Price = 7
-            };
-
-            var requestProduct3 = new AddProductRequest
-            {
-                Name = "Drink",
-                Price = 2.5m,
-            };
-
-            var productId1 = productProvider.AddProduct(requestProduct1);
-            var productId2 = productProvider.AddProduct(requestProduct2);
-            var productId3 = productProvider.AddProduct(requestProduct3);
+            var productId1 = _productProvider.AddProduct(requestProduct1);
+            var productId2 = _productProvider.AddProduct(requestProduct2);
+            var productId3 = _productProvider.AddProduct(requestProduct3);
 
             // Action
-            orderProvider = new OrderProvider(
-                (IPriceStorage)productProvider,
-                new[] { (IDiscountProvider)discountManager },
-                calculator,
-                new TimeHelper(),
-                new BillHelper(productProvider),
-                new ServiceChargeProvider(new ServiceChargeProviderSettings { ServiceRate = 0.1m }));
+            var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
 
             var orderId = orderProvider.CreateOrder();
 
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 4,
-                ProductId = productId1
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId1));
 
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 4,
-                ProductId = productId2,
-                
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId2));
 
-            orderProvider.AddItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 4,
-                ProductId = productId3
-            });
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId3));
 
-            orderProvider.CancelItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId1
-            });
+            orderProvider.CancelItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
 
-            orderProvider.CancelItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId2
-            });
+            orderProvider.CancelItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
 
-            orderProvider.CancelItem(new OrderItemRequest
-            {
-                OrderId = orderId,
-                Count = 1,
-                ProductId = productId3
-            });
+            orderProvider.CancelItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId3));
 
             var actual = orderProvider.Checkout(orderId);
 
