@@ -24,12 +24,13 @@ namespace Restaurant.Tests
 {
     public class OrderProviderTests
     {
-        private ProductProvider _productProvider;
-        private IDiscountByTimeProvider _discountManager;
-        private IDiscountCalculator _calculator;
+        private  ProductProvider _productProvider = new ProductProvider();
+        private  IDiscountByTimeProvider _discountManager;
+        private  IDiscountCalculator _calculator;
         private readonly AddProductRequestGenerator _addProductRequest = new AddProductRequestGenerator();
         private readonly OrderItemRequestGenerator _orderItemRequest = new OrderItemRequestGenerator();
         private readonly OrderProviderGenerator _orderProvider = new OrderProviderGenerator();
+        private readonly DiscountByTimeSettingsGenerator _discountByTimeSettings = new DiscountByTimeSettingsGenerator();
 
         private static IEnumerable<TestCaseData> AddItemsGenerator()
         {
@@ -52,7 +53,6 @@ namespace Restaurant.Tests
         [SetUp]
         public void SetUp()
         {
-            _productProvider = new ProductProvider();
             _discountManager = new DiscountByTimeProvider(new DiscountByTimeProviderSettings
             {
                 EndDiscountDelay = TimeSpan.Zero
@@ -63,30 +63,26 @@ namespace Restaurant.Tests
             });
 
        }
+
         [Test]
         public void Checkout_Integration()
         {
+            //Precondition
             var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Drink", 4);
             var productId1 = _productProvider.AddProduct(requestProduct1);
-            _discountManager.Add(new DiscountByTimeSettings
-            {
-                ProductId = productId1,
-                StartTime = TimeOnly.FromDateTime(DateTime.UtcNow),
-                EndTime = TimeOnly.FromDateTime(DateTime.UtcNow).AddMinutes(1),
-                DiscountValue = 0.1m
-            });
+            _discountManager.Add(_discountByTimeSettings.GenerateDiscountByTimeSettings(productId1, 1, 0.1m));
             var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
-
             var orderId = orderProvider.CreateOrder();
-                     
-            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 2, productId1));
             
+            //Action
+            orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 2, productId1));
             Thread.Sleep(70000);
-
             orderProvider.CancelItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 2, productId1)); 
             
             var actual = orderProvider.Checkout(orderId);
+
+            //Assert
             var expected = new BillExternal
             {
                 Amount = 16,
@@ -149,45 +145,41 @@ namespace Restaurant.Tests
         [TestCase(1, 4)]
         public void Checkout_ServiseCharge(decimal serviceRate, decimal expectedServiceCharge)
         {
+            //Preconditon
             var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, serviceRate);
             var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Drink", 4);
             var productId1 = _productProvider.AddProduct(requestProduct1);
+            
+            //Action
             var orderId = orderProvider.CreateOrder();
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
             var actualServiceCharge = orderProvider.Checkout(orderId).Service;
+
+            //Assert
             Assert.AreEqual(expectedServiceCharge, actualServiceCharge);
         }
 
         [Test]
         public void Checkout_Discount()
         {
-            
+            //Precondition
             var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Drink", 4);
             var requestProduct2 = _addProductRequest.GenerateAddProductRequest("Main", 5);
             var productId1 = _productProvider.AddProduct(requestProduct1);
             var productId2 = _productProvider.AddProduct(requestProduct2);
-
-            _discountManager.Add(new DiscountByTimeSettings
-            {
-                ProductId = productId1,
-                StartTime = TimeOnly.FromDateTime(DateTime.UtcNow),
-                EndTime = TimeOnly.FromDateTime(DateTime.UtcNow).AddMinutes(1),
-                DiscountValue = 0.1m
-            }) ;
+            _discountManager.Add(_discountByTimeSettings.GenerateDiscountByTimeSettings(productId1, 1, 0.1m)) ;
             var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
 
+            //Action
             var orderId = orderProvider.CreateOrder();
-           
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
-
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
             Thread.Sleep(70000);
-
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
             var actual = orderProvider.Checkout(orderId);
+            
             //Assert
-
             var expected = new BillExternal
             {
                 Amount = 18,
@@ -242,31 +234,28 @@ namespace Restaurant.Tests
         {
                         
             // Precondition
-
-
             var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Starter", 4);
-
             var requestProduct2 = _addProductRequest.GenerateAddProductRequest("Main", 7);
-
             var requestProduct3 = _addProductRequest.GenerateAddProductRequest("Drink", 2.5m);
 
             var productId1 = _productProvider.AddProduct(requestProduct1);
             var productId2 = _productProvider.AddProduct(requestProduct2);
             var productId3 = _productProvider.AddProduct(requestProduct3);
+
             var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
-            // Action
-
-            var orderId = orderProvider.CreateOrder();
             
+            // Action
+            var orderId = orderProvider.CreateOrder();
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1)); 
-
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
-
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId3));
+            var actual = orderProvider.Checkout(orderId);
+
+            //Assert
             var expectedAmount = requestProduct1.Price + requestProduct2.Price + requestProduct3.Price;
             var expectedService = 0.1m*(requestProduct1.Price + requestProduct2.Price + requestProduct3.Price);
             var expectedTotal = expectedAmount + expectedService;
-            var actual = orderProvider.Checkout(orderId);
+            
             Assert.Multiple(() =>
             {
                 Assert.AreEqual(orderId, actual.OrderId);
@@ -329,6 +318,7 @@ namespace Restaurant.Tests
             var productId1 = _productProvider.AddProduct(requestProduct);
             var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
             var orderId = orderProvider.CreateOrder();
+
             //Action
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, count, productId1));
             var _orderStorageField = typeof(OrderProvider)
@@ -336,11 +326,10 @@ namespace Restaurant.Tests
             var orderStorage = (ConcurrentBag<Order>)_orderStorageField.GetValue(orderProvider);
             var order = orderStorage.Single(o => o.Id == orderId);
             var actual = order.Items.Count;
-            var expected = count;
 
             //Assert
+            var expected = count;
             Assert.AreEqual(expected, actual);
-
         }
         
         [Test]
@@ -375,7 +364,6 @@ namespace Restaurant.Tests
             var productId1 = _productProvider.AddProduct(requestProduct);
             var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
             var orderId = orderProvider.CreateOrder();
-            
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, addCount, productId1));
             
             //Action-Assert
@@ -395,17 +383,12 @@ namespace Restaurant.Tests
 
             // Action
             var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
-
             var orderId = orderProvider.CreateOrder();
-
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
-
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
-
             var actual = orderProvider.Checkout(orderId);
 
             // Assert
-
             var expected = new BillExternal
             {
                 Amount = 11,
@@ -441,12 +424,8 @@ namespace Restaurant.Tests
         public void Ckeckout_ThreeProductsBy4Items_BillIsCorrect()
         {
             // Precondition
-
-
             var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Starter", 4);
-
             var requestProduct2 = _addProductRequest.GenerateAddProductRequest("Main", 7);
-
             var requestProduct3 = _addProductRequest.GenerateAddProductRequest("Drink", 2.5m);
 
             var productId1 = _productProvider.AddProduct(requestProduct1);
@@ -455,13 +434,10 @@ namespace Restaurant.Tests
 
             // Action
             var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
-
             var orderId = orderProvider.CreateOrder();
 
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId1));
-
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId2));
-
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId3));
 
             var actual = orderProvider.Checkout(orderId);
@@ -595,19 +571,14 @@ namespace Restaurant.Tests
 
             // Action
             var orderProvider = _orderProvider.GenerateOrderProvider(_productProvider, _discountManager, _calculator, 0.1m);
-
             var orderId = orderProvider.CreateOrder();
 
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId1));
-
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId2));
-
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId3));
 
             orderProvider.CancelItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
-
             orderProvider.CancelItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
-
             orderProvider.CancelItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId3));
 
             var actual = orderProvider.Checkout(orderId);
@@ -700,9 +671,6 @@ namespace Restaurant.Tests
             };
 
             actual.Should().BeEquivalentTo(expected);
-        }
-
-        
+        }      
     }
-
 }
