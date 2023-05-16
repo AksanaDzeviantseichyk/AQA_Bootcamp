@@ -34,7 +34,7 @@ namespace Task_9
         }
         [Test]
         //10
-        public async Task T10_NotExsistUserId_GetUserStatus_StatusCodeIsSuccsses()
+        public async Task T10_NotExistRegister_GetUserStatus_StatusCodeIsSuccsses()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
@@ -62,8 +62,38 @@ namespace Task_9
         }
 
         [Test]
+        [TestCase(true)]
+        //13,15
+        public async Task T13_15_ChangeUserStatusFromFalseToTrue_SetUserStatus_GetUserStatus_UserStatusIsTrue(bool newUserStatus)
+        {
+            // Precondition
+            var request = _userGenerator.GenerateRegisterNewUserRequest();
+            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            // Action
+            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, newUserStatus);
+            var responseGetUserStatus = await _userServiceClient.GetUserStatus(responseRegisterUser.Body);
+            // Assert
+            Assert.AreEqual(newUserStatus, responseGetUserStatus.Body);
+
+        }
+
+        [Test]
+        //14
+        public async Task T14_NotExistRegisterUser_SetUserStatus_StatusCodeNotFound()
+        {
+            // Precondition
+            var request = _userGenerator.GenerateRegisterNewUserRequest();
+            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            // Action
+            var responseGetUserStatus = await _userServiceClient.GetUserStatus(responseRegisterUser.Body+1);
+            // Assert
+            Assert.AreEqual(HttpStatusCode.NotFound, responseGetUserStatus.Status);
+
+        }
+
+        [Test]
         //21
-        public async Task T21_NotExsistUserId_DeleteUser_StatusCodeIsInternalServerError()
+        public async Task T21_NotExistRegisterUser_DeleteUser_StatusCodeIsInternalServerError()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
