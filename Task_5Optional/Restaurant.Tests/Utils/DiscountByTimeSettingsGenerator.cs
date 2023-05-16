@@ -18,6 +18,7 @@ namespace Restaurant.Tests.Utils
                 StartTime = TimeOnly.FromDateTime(DateTime.UtcNow),
                 EndTime = TimeOnly.FromDateTime(DateTime.UtcNow).AddMinutes(discountMinutes),
                 DiscountValue = discountValue
+            };
         }
     }
 }
