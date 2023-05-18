@@ -7,13 +7,12 @@ using System.Threading.Tasks;
 
 namespace Task_9.Models.Requests
 {
-    public class RegisterNewUserRequest
+    public class BalanceChargeRequest
     {
-        [JsonProperty("firstName")]
-        public string? FirstName;
+        [JsonProperty("userId")]
+        public string UserId;
 
-        [JsonProperty("lastName")]
-        public string? LastName;
-
+        [JsonProperty("amount")]
+        public string Amount;
     }
 }
