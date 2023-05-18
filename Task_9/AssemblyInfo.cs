@@ -13,8 +13,8 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 
-[assembly: Parallelizable(ParallelScope.All)]
-[assembly: LevelOfParallelism(5)]
+//[assembly: Parallelizable(ParallelScope.All)]
+//[assembly: LevelOfParallelism(5)]
 
 // Следующий GUID служит для идентификации библиотеки типов typelib, если этот проект
 // будет видимым для COM.

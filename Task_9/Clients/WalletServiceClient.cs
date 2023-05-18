@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Task_9.Extensions;
 using Task_9.Models.Requests;
+using Task_9.Models.Responses;
 using Task_9.Models.Responses.Base;
 
 namespace Task_9.Clients
@@ -28,7 +29,7 @@ namespace Task_9.Clients
             return await response.ToCommonResponse<decimal>();
         }
 
-        public async Task<CommonResponse<Guid>> BalanceCharge(RegisterNewUserRequest request)
+        public async Task<CommonResponse<Guid>> BalanceCharge(BalanceChargeRequest request)
         {
             var httpRequestMessage = new HttpRequestMessage
             {
@@ -42,5 +43,30 @@ namespace Task_9.Clients
             return await response.ToCommonResponse<Guid>();
         }
 
+        public async Task<CommonResponse<Guid>> RevertTransaction(Guid transactionId)
+        {
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri($"{_baseUrl}/Balance/RevertTransaction?transactionId={transactionId}"),
+            };
+
+            HttpResponseMessage response = await _client.SendAsync(httpRequestMessage);
+
+            return await response.ToCommonResponse<Guid>();
+        }
+
+        public async Task<CommonResponse<List<GetTransactionInfoResponse>>> GetTransaction(Int32 userId)
+        {
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{_baseUrl}/Balance/GetTransactions?userId={userId}"),
+            };
+
+            HttpResponseMessage response = await _client.SendAsync(httpRequestMessage);
+
+            return await response.ToCommonResponse<List<GetTransactionInfoResponse>>();
+        }
     }
 }

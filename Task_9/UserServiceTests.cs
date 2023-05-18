@@ -80,7 +80,7 @@ namespace Task_9
 
         [Test]
         //10
-        public async Task T10_NotExistRegisterUser_GetUserStatus_StatusCodeIsSuccsses()
+        public async Task T10_NotExistRegisterUser_GetUserStatus_StatusCodeIsNotFound()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
