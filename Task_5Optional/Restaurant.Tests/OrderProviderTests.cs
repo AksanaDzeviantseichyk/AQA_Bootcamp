@@ -18,6 +18,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Restaurant.Tests
@@ -65,7 +66,7 @@ namespace Restaurant.Tests
        }
 
         [Test]
-        public void Checkout_Integration()
+        public async Task Checkout_Integration()
         {
             //Precondition
             var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Drink", 4);
@@ -76,60 +77,16 @@ namespace Restaurant.Tests
             
             //Action
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 2, productId1));
-            Thread.Sleep(70000);
+            await Task.Delay(TimeSpan.FromSeconds(70));
             orderProvider.CancelItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 2, productId1)); 
             
             var actual = orderProvider.Checkout(orderId);
-
+            ExpectedBillExternal expectedBillExternal = new ExpectedBillExternal();
+            
             //Assert
-            var expected = new BillExternal
-            {
-                Amount = 16,
-                AmountDiscounted = 15.2m,
-                Discount = 0.8m,
-                OrderId = orderId,
-                Service = 1.52m,
-                Total = 16.72m,
-                Items = new[]
-                {
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0.4m,
-                        AmountDiscounted = 3.6m,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0.4m,
-                        AmountDiscounted = 3.6m,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0,
-                        AmountDiscounted = 4,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0,
-                        AmountDiscounted = 4,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    }
-                }
-            };
-
+            var expected = expectedBillExternal.IntegrationDisountServiceRate(orderId, requestProduct1.Name);
             actual.Should().BeEquivalentTo(expected);
-
         }
 
         [TestCase(0, 0)]
@@ -160,7 +117,7 @@ namespace Restaurant.Tests
         }
 
         [Test]
-        public void Checkout_Discount()
+        public async Task Checkout_Discount()
         {
             //Precondition
             var requestProduct1 = _addProductRequest.GenerateAddProductRequest("Drink", 4);
@@ -174,56 +131,15 @@ namespace Restaurant.Tests
             var orderId = orderProvider.CreateOrder();
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
-            Thread.Sleep(70000);
+            await Task.Delay(TimeSpan.FromSeconds(70));
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
             var actual = orderProvider.Checkout(orderId);
-            
+            ExpectedBillExternal expectedBillExternal = new ExpectedBillExternal();
+
             //Assert
-            var expected = new BillExternal
-            {
-                Amount = 18,
-                AmountDiscounted = 17.6m,
-                Discount = 0.4m,
-                OrderId = orderId,
-                Service = 1.76m,
-                Total = 19.36m,
-                Items = new[]
-                {
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0.4m,
-                        AmountDiscounted = 3.6m,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 5,
-                        Discount = 0,
-                        AmountDiscounted = 5,
-                        PersonId = 0,
-                        ProductName = requestProduct2.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0,
-                        AmountDiscounted = 4,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 5,
-                        Discount = 0,
-                        AmountDiscounted = 5,
-                        PersonId = 0,
-                        ProductName = requestProduct2.Name
-                    }
-                }
-            };
+            var expected = expectedBillExternal.CheckDiscount(
+                orderId, requestProduct1.Name, requestProduct2.Name);
 
             actual.Should().BeEquivalentTo(expected);
 
@@ -310,7 +226,6 @@ namespace Restaurant.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        [Test]
         [TestCaseSource(nameof(AddItemsGenerator))]
         public void AddItem_SomeItemInOrder_ItemCountInOrderIsCorrect(AddProductRequest requestProduct, int count)
         {
@@ -332,7 +247,6 @@ namespace Restaurant.Tests
             Assert.AreEqual(expected, actual);
         }
         
-        [Test]
         [TestCaseSource(nameof(CancelItemsGenerator))]
         public void CancelItem_FromOrder_ItemCountInOrderIsCorrect(AddProductRequest requestProduct, int addCount, int cancelCount)
         {
@@ -356,7 +270,7 @@ namespace Restaurant.Tests
             Assert.AreEqual(expected, actual);
 
         }
-        [Test]
+
         [TestCaseSource(nameof(IncorrectCancelItemCountGenerator))]
         public void CancelItem_IncorrectCancelItemCount_ShouldThrowArgumentOutOfRangeException(AddProductRequest requestProduct, int addCount, int cancelCount)
         {
@@ -387,35 +301,11 @@ namespace Restaurant.Tests
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId1));
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId2));
             var actual = orderProvider.Checkout(orderId);
+            ExpectedBillExternal expectedBillExternal = new ExpectedBillExternal();
 
-            // Assert
-            var expected = new BillExternal
-            {
-                Amount = 11,
-                AmountDiscounted = 11,
-                Discount = 0,
-                OrderId = orderId,
-                Service = 1.1m,
-                Total = 12.1m,
-                Items = new[]
-                {
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0,
-                        AmountDiscounted = 4,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 7,
-                        Discount = 0,
-                        AmountDiscounted = 7,
-                        ProductName = requestProduct2.Name
-                    }
-                }
-            };
+            //Assert
+            var expected = expectedBillExternal.TwoProductsInOrder(
+                orderId, requestProduct1.Name, requestProduct2.Name);
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -441,117 +331,11 @@ namespace Restaurant.Tests
             orderProvider.AddItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 4, productId3));
 
             var actual = orderProvider.Checkout(orderId);
+            ExpectedBillExternal expectedBillExternal = new ExpectedBillExternal();
 
             //Assert
-
-            var expected = new BillExternal
-            {
-                Amount = 54,
-                AmountDiscounted = 54,
-                Discount = 0,
-                OrderId = orderId,
-                Service = 5.4m,
-                Total = 59.4m,
-                Items = new[]
-                {
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0,
-                        AmountDiscounted = 4,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0,
-                        AmountDiscounted = 4,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0,
-                        AmountDiscounted = 4,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0,
-                        AmountDiscounted = 4,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 7,
-                        Discount = 0,
-                        AmountDiscounted = 7,
-                        PersonId = 0,
-                        ProductName = requestProduct2.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 7,
-                        Discount = 0,
-                        AmountDiscounted = 7,
-                        PersonId = 0,
-                        ProductName = requestProduct2.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 7,
-                        Discount = 0,
-                        AmountDiscounted = 7,
-                        PersonId = 0,
-                        ProductName = requestProduct2.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 7,
-                        Discount = 0,
-                        AmountDiscounted = 7,
-                        PersonId = 0,
-                        ProductName = requestProduct2.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 2.5m,
-                        Discount = 0,
-                        AmountDiscounted = 2.5m,
-                        PersonId = 0,
-                        ProductName = requestProduct3.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 2.5m,
-                        Discount = 0,
-                        AmountDiscounted = 2.5m,
-                        PersonId = 0,
-                        ProductName = requestProduct3.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 2.5m,
-                        Discount = 0,
-                        AmountDiscounted = 2.5m,
-                        PersonId = 0,
-                        ProductName = requestProduct3.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 2.5m,
-                        Discount = 0,
-                        AmountDiscounted = 2.5m,
-                        PersonId = 0,
-                        ProductName = requestProduct3.Name
-                    }
-                }
-            };
+            var expected = expectedBillExternal.ThreeProductsBy4Items(
+                orderId, requestProduct1.Name, requestProduct2.Name, requestProduct3.Name);
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -582,94 +366,11 @@ namespace Restaurant.Tests
             orderProvider.CancelItem(_orderItemRequest.GenerateOrderItemRequest(orderId, 1, productId3));
 
             var actual = orderProvider.Checkout(orderId);
+            ExpectedBillExternal expectedBillExternal = new ExpectedBillExternal();
 
             //Assert
-
-            var expected = new BillExternal
-            {
-                Amount = 40.5m,
-                AmountDiscounted = 40.5m,
-                Discount = 0,
-                OrderId = orderId,
-                Service = 4.05m,
-                Total = 44.55m,
-                Items = new[]
-                {
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0,
-                        AmountDiscounted = 4,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0,
-                        AmountDiscounted = 4,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 4,
-                        Discount = 0,
-                        AmountDiscounted = 4,
-                        PersonId = 0,
-                        ProductName = requestProduct1.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 7,
-                        Discount = 0,
-                        AmountDiscounted = 7,
-                        PersonId = 0,
-                        ProductName = requestProduct2.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 7,
-                        Discount = 0,
-                        AmountDiscounted = 7,
-                        PersonId = 0,
-                        ProductName = requestProduct2.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 7,
-                        Discount = 0,
-                        AmountDiscounted = 7,
-                        PersonId = 0,
-                        ProductName = requestProduct2.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 2.5m,
-                        Discount = 0,
-                        AmountDiscounted = 2.5m,
-                        PersonId = 0,
-                        ProductName = requestProduct3.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 2.5m,
-                        Discount = 0,
-                        AmountDiscounted = 2.5m,
-                        PersonId = 0,
-                        ProductName = requestProduct3.Name
-                    },
-                    new BillItemExternal
-                    {
-                        Amount = 2.5m,
-                        Discount = 0,
-                        AmountDiscounted = 2.5m,
-                        PersonId = 0,
-                        ProductName = requestProduct3.Name
-                    }
-                }
-            };
-
+            var expected = expectedBillExternal.CancellAllProductsBy1QtyAndCheckout(
+                orderId, requestProduct1.Name, requestProduct2.Name, requestProduct3.Name);
             actual.Should().BeEquivalentTo(expected);
         }      
     }
