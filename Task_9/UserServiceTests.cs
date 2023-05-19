@@ -10,7 +10,7 @@ namespace Task_9
     {
         private readonly UserServiceClient _userServiceClient = new UserServiceClient();
         private readonly UserGenerator _userGenerator = new UserGenerator();
-        private readonly string _noElementsMessage = "Sequence contains no matching element";
+        private readonly string _noElementsMessage = "Sequence contains no elements";
         private readonly string _cannotFindUserIdMessage = "Specified argument was out of the range of valid values. (Parameter 'cannot find user with this id')";
 
         private static IEnumerable<TestCaseData> ValidUserInfo()
@@ -72,10 +72,17 @@ namespace Task_9
             var request = _userGenerator.GenerateRegisterNewUserRequest();
             // Action
             var responseRegisterUser1 = await _userServiceClient.RegisterNewUser(request);
-            await _userServiceClient.DeleteUser(Convert.ToInt32(responseRegisterUser1.Body));
+            var responseDeleteUser1 = await _userServiceClient.DeleteUser(responseRegisterUser1.Body);
+            var responseGetStatusDeletedUser1 = await _userServiceClient.GetUserStatus(responseRegisterUser1.Body);
             var responseRegisterUser2 = await _userServiceClient.RegisterNewUser(request);
             // Assert
-            Assert.IsTrue(responseRegisterUser2.Body > responseRegisterUser1.Body);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(HttpStatusCode.OK, responseDeleteUser1.Status);
+                Assert.AreEqual(HttpStatusCode.NotFound, responseGetStatusDeletedUser1.Status);
+                Assert.AreEqual(HttpStatusCode.OK, responseRegisterUser2.Status);
+                Assert.IsTrue(responseRegisterUser2.Body > responseRegisterUser1.Body);
+            });
         }
 
         [Test]
