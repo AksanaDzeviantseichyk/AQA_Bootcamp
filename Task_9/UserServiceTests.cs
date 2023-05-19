@@ -34,7 +34,7 @@ namespace Task_9
 
         [TestCaseSource(nameof(ValidUserInfo))]
         //1,2,3,4,5,6,7
-        public async Task T1to7_ValidUser_RegisterNewUser_StatusCodeIsSuccsses(RegisterNewUserRequest request)
+        public async Task T1to7_RegisterNewUser_NewValidUser_StatusCodeIsSuccsses(RegisterNewUserRequest request)
         {
             // Action
             var response = await _userServiceClient.RegisterNewUser(request);
@@ -45,7 +45,7 @@ namespace Task_9
 
         [Test]
         //8
-        public async Task T8_ValidSomeUsers_RegisterNewUser_ReturningUserIdIsAutoincremented()
+        public async Task T8_RegisterNewUser_SomeNewValidUsers_ReturningUserIdIsAutoincremented()
         {
             // Precondition
             var request1 = _userGenerator.GenerateRegisterNewUserRequest();
@@ -66,7 +66,7 @@ namespace Task_9
 
         [Test]
         //9
-        public async Task T9_DeleteExistUserAndRegisterNewValidUser_DeleteUser_RegisterNewUser_NewUserIdIsIncremented()
+        public async Task T9_DeleteUser_RegisterNewUser_DeleteExistUserAndRegisterNewValidUser_NewUserIdIsIncremented()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
@@ -87,7 +87,7 @@ namespace Task_9
 
         [Test]
         //10
-        public async Task T10_NotExistRegisterUser_GetUserStatus_StatusCodeIsNotFound()
+        public async Task T10_GetUserStatus_NotExistRegisterUser_StatusCodeIsNotFound()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
@@ -104,7 +104,7 @@ namespace Task_9
 
         [TestCase(false)]
         //11
-        public async Task T11_DefaultUserStatus_RegisterNewUser_GetUserStatus_UserStatusIsFalse(bool defaultUserStatus)
+        public async Task T11_RegisterNewUser_GetUserStatus_DefaultUserStatus_UserStatusIsFalse(bool defaultUserStatus)
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
@@ -117,7 +117,7 @@ namespace Task_9
 
         [Test]
         //13,15
-        public async Task T13_15_ChangeUserStatusFromFalseToTrue_SetUserStatus_GetUserStatus_UserStatusIsTrue()
+        public async Task T13_15_SetUserStatus_GetUserStatus_ChangeUserStatusFromFalseToTrue_UserStatusIsTrue()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
@@ -137,7 +137,7 @@ namespace Task_9
 
         [Test]
         //12,16
-        public async Task T12_16_ChangeUserStatusFalseTrueFalse_SetUserStatus_GetUserStatus_UserStatusIsFalse()
+        public async Task T12_16_SetUserStatus_GetUserStatus_ChangeUserStatusFalseTrueFalse_UserStatusIsFalse()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
@@ -157,7 +157,7 @@ namespace Task_9
 
         [Test]
         //14
-        public async Task T14_NotExistRegisterUser_SetUserStatus_StatusCodeNotFound()
+        public async Task T14_SetUserStatus_NotExistRegisterUser_StatusCodeNotFound()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
@@ -174,7 +174,7 @@ namespace Task_9
 
         [Test]
         //17
-        public async Task T17_ChangeUserStatusFalseTrueFalseTrue_SetUserStatus_GetUserStatus_UserStatusIsFalse()
+        public async Task T17_SetUserStatus_GetUserStatus_ChangeUserStatusFalseTrueFalseTrue_UserStatusIsFalse()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
@@ -195,7 +195,7 @@ namespace Task_9
 
         [Test]
         //18
-        public async Task T18_ChangeUserStatusFalseToFalse_SetUserStatus_GetUserStatus_UserStatusIsFalse()
+        public async Task T18_SetUserStatus_GetUserStatus_ChangeUserStatusFalseToFalse_UserStatusIsFalse()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
@@ -214,7 +214,7 @@ namespace Task_9
 
         [Test]
         //19
-        public async Task T19_ChangeUserStatusTrueToTrue_SetUserStatus_GetUserStatus_UserStatusIsTrue()
+        public async Task T19_SetUserStatus_GetUserStatus_ChangeUserStatusTrueToTrue_UserStatusIsTrue()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
@@ -234,7 +234,7 @@ namespace Task_9
 
         [Test]
         //20
-        public async Task T20_NotActiveUser_DeleteUser_StatusCodeIsOK()
+        public async Task T20_DeleteUser_NotActiveUser_StatusCodeIsOK()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
@@ -248,7 +248,7 @@ namespace Task_9
 
         [Test]
         //21
-        public async Task T21_NotExistRegisterUser_DeleteUser_StatusCodeIsInternalServerError()
+        public async Task T21_DeleteUser_NotExistRegisterUser_StatusCodeIsInternalServerError()
         {
             // Precondition
             var request = _userGenerator.GenerateRegisterNewUserRequest();
