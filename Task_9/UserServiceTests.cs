@@ -93,7 +93,7 @@ namespace Task_9
             var request = _userGenerator.GenerateRegisterNewUserRequest();
             var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
             // Action
-            var responseGetUserStatus = await _userServiceClient.GetUserStatus(responseRegisterUser.Body + 1);
+            var responseGetUserStatus = await _userServiceClient.GetUserStatus(responseRegisterUser.Body + 10);
             // Assert
             Assert.Multiple(() =>
             {
@@ -163,7 +163,7 @@ namespace Task_9
             var request = _userGenerator.GenerateRegisterNewUserRequest();
             var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
             // Action
-            var responseSetUserStatus = await _userServiceClient.SetUserStatus(responseRegisterUser.Body+1, true);
+            var responseSetUserStatus = await _userServiceClient.SetUserStatus(responseRegisterUser.Body+10, true);
             // Assert
             Assert.Multiple(() =>
             {
@@ -254,7 +254,7 @@ namespace Task_9
             var request = _userGenerator.GenerateRegisterNewUserRequest();
             var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
             // Action
-            var responseDeleteUser = await _userServiceClient.DeleteUser(responseRegisterUser.Body+1);
+            var responseDeleteUser = await _userServiceClient.DeleteUser(responseRegisterUser.Body+10);
             // Assert
             Assert.Multiple(() =>
             {
