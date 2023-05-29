@@ -1,14 +1,14 @@
 ﻿using NUnit.Framework;
 using System.Net;
-using Task_9.Clients;
-using Task_9.Models.Requests;
-using Task_9.Utils;
+using Task_9.Core.Clients;
+using Task_9.Core.Models.Requests;
+using Task_9.Core.Utils;
 
-namespace Task_9
+namespace Task_9.Tests
 {
     public class UserServiceTests
     {
-        private readonly UserServiceClient _userServiceClient = new UserServiceClient();
+        private readonly UserServiceClient _userServiceClient = UserServiceClient.Instance;
         private readonly UserGenerator _userGenerator = new UserGenerator();
         private readonly string _noElementsMessage = "Sequence contains no elements";
         private readonly string _cannotFindUserIdMessage = "Specified argument was out of the range of valid values. (Parameter 'cannot find user with this id')";
@@ -39,7 +39,7 @@ namespace Task_9
             // Action
             var response = await _userServiceClient.RegisterNewUser(request);
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.Status, 
+            Assert.AreEqual(HttpStatusCode.OK, response.Status,
                 $"User with FirstName = {request.FirstName} and LastName = {request.LastName} IS NOT register");
         }
 
@@ -49,7 +49,7 @@ namespace Task_9
         {
             // Precondition
             var request1 = _userGenerator.GenerateRegisterNewUserRequest();
-            
+
             // Action
             var responseRegisterUser1 = await _userServiceClient.RegisterNewUser(request1);
             var responseRegisterUser2 = await _userServiceClient.RegisterNewUser(request1);
@@ -163,7 +163,7 @@ namespace Task_9
             var request = _userGenerator.GenerateRegisterNewUserRequest();
             var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
             // Action
-            var responseSetUserStatus = await _userServiceClient.SetUserStatus(responseRegisterUser.Body+10, true);
+            var responseSetUserStatus = await _userServiceClient.SetUserStatus(responseRegisterUser.Body + 10, true);
             // Assert
             Assert.Multiple(() =>
             {
@@ -254,7 +254,7 @@ namespace Task_9
             var request = _userGenerator.GenerateRegisterNewUserRequest();
             var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
             // Action
-            var responseDeleteUser = await _userServiceClient.DeleteUser(responseRegisterUser.Body+10);
+            var responseDeleteUser = await _userServiceClient.DeleteUser(responseRegisterUser.Body + 10);
             // Assert
             Assert.Multiple(() =>
             {

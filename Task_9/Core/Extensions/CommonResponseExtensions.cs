@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Task_9.Models.Responses.Base;
+using Task_9.Core.Models.Responses.Base;
 
-namespace Task_9.Extensions
+namespace Task_9.Core.Extensions
 {
     public static class CommonResponseExtensions
     {

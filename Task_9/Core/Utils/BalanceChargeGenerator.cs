@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Task_9.Models.Requests;
+using Task_9.Core.Models.Requests;
 
-namespace Task_9.Utils
+namespace Task_9.Core.Utils
 {
     public class BalanceChargeGenerator
     {

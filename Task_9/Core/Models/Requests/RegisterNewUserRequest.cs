@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Task_9.Models.Requests
+namespace Task_9.Core.Models.Requests
 {
     public class RegisterNewUserRequest
     {

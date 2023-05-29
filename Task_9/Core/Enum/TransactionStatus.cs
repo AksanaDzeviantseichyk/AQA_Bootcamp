@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Task_9.Enum
+namespace Task_9.Core.Enum
 {
     public enum TransactionStatus
     {

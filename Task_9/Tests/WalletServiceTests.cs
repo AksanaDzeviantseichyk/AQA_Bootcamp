@@ -1,17 +1,19 @@
 ﻿using NUnit.Framework;
 using System.Net;
-using Task_9.Enum;
-using Task_9.Clients;
-using Task_9.Utils;
 using Bogus;
+using Task_9.Core.Clients;
+using Task_9.Core.Enum;
+using Task_9.Core.Utils;
+using NodaTime;
+using System;
 
-namespace Task_9
+namespace Task_9.Tests
 {
     public class WalletServiceTests
     {
-        private readonly WalletServiceClient _walletServiceClient = new WalletServiceClient();
+        private readonly WalletServiceClient _walletServiceClient = WalletServiceClient.Instance;
         private readonly BalanceChargeGenerator _balanceChargeGenerator = new BalanceChargeGenerator();
-        private readonly UserServiceClient _userServiceClient = new UserServiceClient();
+        private readonly UserServiceClient _userServiceClient = UserServiceClient.Instance;
         private readonly UserGenerator _userGenerator = new UserGenerator();
         private readonly string _notActiveUserMessage = "not active user";
 
@@ -40,7 +42,7 @@ namespace Task_9
             var request = _userGenerator.GenerateRegisterNewUserRequest();
             var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
             //Action
-            var responseGetBalance = await _walletServiceClient.GetBalance(responseRegisterUser.Body+10);
+            var responseGetBalance = await _walletServiceClient.GetBalance(responseRegisterUser.Body + 10);
             //Assert
             Assert.Multiple(() =>
             {
@@ -150,7 +152,7 @@ namespace Task_9
             //Precondition
             var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
             var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body+10, 100);
+            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body + 10, 100);
 
             //Action
             var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
@@ -279,7 +281,7 @@ namespace Task_9
         //56
         [TestCase(100, 10, 100)]
         [TestCase(100, 10, -100)]
-        
+
         public async Task T45_50_56_BalanceCharge_BalanceNCarge10AmountChargeNAmount_BalanceIsPositiveAndStatusCodeIsOk(
             decimal balanceN, decimal charge1, decimal charge2)
         {
@@ -493,16 +495,21 @@ namespace Task_9
             var activeUser = await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
             var responseChargeBalance = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            DateTimeZone desiredTimeZone = DateTimeZoneProviders.Tzdb["Etc/GMT"];
+            ZonedDateTime currentZonedDateTime = SystemClock.Instance.GetCurrentInstant().InZone(desiredTimeZone);
+            LocalDate expectedDate = currentZonedDateTime.Date;
+            
             //Action
             var responseTransaction = await _walletServiceClient.GetTransaction(responseRegisterUser.Body);
             //Assert
-            DateTime currentDate = DateTime.Now;
+            
+            LocalDate actualDate = LocalDate.FromDateTime(responseTransaction.Body[0].Time.Date);
             Assert.Multiple(() =>
             {
                 Assert.AreEqual(responseRegisterUser.Body, responseTransaction.Body[0].UserId);
                 Assert.AreEqual(amount, responseTransaction.Body[0].Amount);
                 Assert.AreEqual(responseChargeBalance.Body, responseTransaction.Body[0].TransactionId);
-                Assert.AreEqual(currentDate.Date, responseTransaction.Body[0].Time.Date);
+                Assert.AreEqual(expectedDate, actualDate);
                 Assert.AreEqual(TransactionStatus.NotReverted, responseTransaction.Body[0].Status);
                 Assert.AreEqual(null, responseTransaction.Body[0].BaseTransactionId);
             });
@@ -521,7 +528,7 @@ namespace Task_9
             //Action
             var responseRevertTransaction = await _walletServiceClient.RevertTransaction(responseBalanceCharge.Body);
             var responseGetTransaction = await _walletServiceClient.GetTransaction(responseRegisterUser.Body);
-            
+
             //Assert
             Assert.Multiple(() =>
             {
@@ -559,7 +566,7 @@ namespace Task_9
             var request = _userGenerator.GenerateRegisterNewUserRequest();
             var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
             //Action
-            var responseGetBalance = await _walletServiceClient.GetTransaction(responseRegisterUser.Body+10);
+            var responseGetBalance = await _walletServiceClient.GetTransaction(responseRegisterUser.Body + 10);
             //Assert
             Assert.Multiple(() =>
             {

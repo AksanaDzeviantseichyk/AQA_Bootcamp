@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Task_9.Models.Responses.Base
+namespace Task_9.Core.Models.Responses.Base
 {
     public class CommonResponse<T>
     {

@@ -1,6 +1,6 @@
-﻿using Task_9.Enum;
+﻿using Task_9.Core.Enum;
 
-namespace Task_9.Models.Responses
+namespace Task_9.Core.Models.Responses
 {
     public class GetTransactionInfoResponse
     {
