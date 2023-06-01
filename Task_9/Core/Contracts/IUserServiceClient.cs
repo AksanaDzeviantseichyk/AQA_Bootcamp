@@ -11,8 +11,8 @@ namespace Task_9.Core.Contracts
     public interface IUserServiceClient
     {
         Task<CommonResponse<int>> RegisterNewUser(RegisterNewUserRequest request);
-        Task<CommonResponse<object>> DeleteUser(Int32 userId);
-        Task<CommonResponse<object>> SetUserStatus(Int32 userId, bool newStatus);
-        Task<CommonResponse<bool>> GetUserStatus(Int32 userId);
+        Task<CommonResponse<object>> DeleteUser(int userId);
+        Task<CommonResponse<object>> SetUserStatus(int userId, bool newStatus);
+        Task<CommonResponse<bool>> GetUserStatus(int userId);
     }
 }

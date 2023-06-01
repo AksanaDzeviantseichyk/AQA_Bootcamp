@@ -10,7 +10,7 @@ namespace Task_9.Core.Models.Requests
     public class BalanceChargeRequest
     {
         [JsonProperty("userId")]
-        public Int32 UserId;
+        public int UserId;
 
         [JsonProperty("amount")]
         public decimal Amount;

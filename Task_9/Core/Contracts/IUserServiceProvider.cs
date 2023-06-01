@@ -13,6 +13,8 @@ namespace Task_9.Core.Contracts
         Task<CommonResponse<int>> RegisterValidUser();
         Task<CommonResponse<int>> RegisterValidUser(RegisterNewUserRequest request);
         Task<int> GetNotExistUserId();
+        Task<int> GetActiveUserId();
+        Task<int> GetNotActiveUserId();
         Task<CommonResponse<object>> DeleteExistUser(int userId);
         Task<CommonResponse<object>> DeleteNotExistUser(int notExistUserId);
         Task<CommonResponse<object>> SetTrueStatusExistUser(int userId);

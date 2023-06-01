@@ -11,9 +11,9 @@ namespace Task_9.Core.Contracts
 {
     public interface IWalletServiceClient
     {
-        Task<CommonResponse<decimal>> GetBalance(Int32 userId);
+        Task<CommonResponse<decimal>> GetBalance(int userId);
         Task<CommonResponse<Guid>> BalanceCharge(BalanceChargeRequest request);
         Task<CommonResponse<Guid>> RevertTransaction(Guid transactionId);
-        Task<CommonResponse<List<GetTransactionInfoResponse>>> GetTransaction(Int32 userId);
+        Task<CommonResponse<List<GetTransactionInfoResponse>>> GetTransaction(int userId);
     }
 }

@@ -11,7 +11,7 @@ using Task_9.Core.Utils;
 
 namespace Task_9.Core.Providers
 {
-    internal class UserServiceProvider: IUserServiceProvider
+    public class UserServiceProvider: IUserServiceProvider
     {
         private readonly IUserServiceClient _userServiceClient;
         private readonly UserGenerator _userGenerator;
@@ -23,20 +23,31 @@ namespace Task_9.Core.Providers
             _userGenerator = generator;
         }
 
-        public async Task<CommonResponse<Int32>> RegisterValidUser()
+        public async Task<CommonResponse<int>> RegisterValidUser()
         {
             var request = _userGenerator.GenerateRegisterNewUserRequest();
             return await _userServiceClient.RegisterNewUser(request);
         }
-        public async Task<CommonResponse<Int32>> RegisterValidUser(RegisterNewUserRequest request)
+        public async Task<CommonResponse<int>> RegisterValidUser(RegisterNewUserRequest request)
         {
             return await _userServiceClient.RegisterNewUser(request);
         }
         public async Task<int> GetNotExistUserId()
         {
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var registerNewUser = await _userServiceClient.RegisterNewUser(request);
-            return registerNewUser.Body+10;
+            var request = await RegisterValidUser();
+            return request.Body+10;
+        }
+        public async Task<int> GetActiveUserId()
+        {
+            var request = await RegisterValidUser();
+            await SetTrueStatusExistUser(request.Body);
+            return request.Body;
+        }
+
+        public async Task<int> GetNotActiveUserId()
+        {
+            var request = await RegisterValidUser();
+            return request.Body;
         }
         public async Task<CommonResponse<object>> DeleteExistUser(int userId)
         {

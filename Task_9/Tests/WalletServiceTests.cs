@@ -20,9 +20,9 @@ namespace Task_9.Tests
         public async Task T1_2_15_GetBalance_NewNotActiveUserNoTransaction_StatusCodeIsInternalServerError()
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            var userId = await _userProvider.GetNotActiveUserId();
             //Action
-            var responseGetBalance = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
+            var responseGetBalance = await _walletProvider.GetBalance(userId);
             //Assert
             Assert.Multiple(() =>
             {
@@ -38,7 +38,7 @@ namespace Task_9.Tests
             //Precondition
             var notExistUserId = await _userProvider.GetNotExistUserId();
             //Action
-            var responseGetBalance = await _walletServiceClient.GetBalance(notExistUserId);
+            var responseGetBalance = await _walletProvider.GetBalance(notExistUserId);
             //Assert
             Assert.Multiple(() =>
             {
@@ -56,12 +56,10 @@ namespace Task_9.Tests
         public async Task T10_12_13_49_GetBalance_OneTransictionWithSomePositiveAmount_StatusCodeIsOk(decimal amount)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest1 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
+            var activeUserId = await _userProvider.GetActiveUserId();
             //Action
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest1);
-            var responseGetBalance = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, amount);
+            var responseGetBalance = await _walletProvider.GetBalance(activeUserId);
             //Assert
             Assert.Multiple(() =>
             {
@@ -78,13 +76,9 @@ namespace Task_9.Tests
         public async Task T11_14_BalanceCharge_OneTransactionWithSomeNegativeAmount_StatusCodeIsInternalServerError(decimal negativeAmount)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(
-                responseRegisterUser.Body, negativeAmount);
-
+            var activeUserId = await _userProvider.GetActiveUserId();
             //Action
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, negativeAmount);
             //Assert
             var expectedMessage = $"User have '{0}', you try to charge '{negativeAmount}'.";
             Assert.Multiple(() =>
@@ -99,17 +93,13 @@ namespace Task_9.Tests
         public async Task T16_35_GetBalance_RevertOneTransactionAndGetBalance_BalanceIsEqualPreviousValue(decimal balance, decimal amountRevert)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-           
-            var balanceChargeRequest1 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, balance);
-            await _walletServiceClient.BalanceCharge(balanceChargeRequest1);
-            var expectedBalanceAfterRevert = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
-            var balanceChargeRequest2 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amountRevert);
-            var revertRequest = await _walletServiceClient.BalanceCharge(balanceChargeRequest2);
+            var activeUserId = await _userProvider.GetActiveUserId();
+            await _walletProvider.BalanceCharge(activeUserId, balance);
+            var expectedBalanceAfterRevert = await _walletProvider.GetBalance(activeUserId);
+            var revertRequest = await _walletProvider.BalanceCharge(activeUserId, amountRevert);
             //Action
-            await _walletServiceClient.RevertTransaction(revertRequest.Body);
-            var actualBalanceAfterRevert = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
+            await _walletProvider.RevertExistTransaction(revertRequest.Body);
+            var actualBalanceAfterRevert = await _walletProvider.GetBalance(activeUserId);
 
             //Assert
             Assert.Multiple(() =>
@@ -117,7 +107,6 @@ namespace Task_9.Tests
                 Assert.AreEqual(HttpStatusCode.OK, actualBalanceAfterRevert.Status);
                 Assert.AreEqual(expectedBalanceAfterRevert.Body, actualBalanceAfterRevert.Body);
             });
-
         }
 
         [Test]
@@ -125,11 +114,11 @@ namespace Task_9.Tests
         public async Task T43_BalanceCharge_NotActiveUser_StatusCodeIsInternalServerError()
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, 100);
-
+            var notActiveUserId = await _userProvider.GetNotActiveUserId();
+            
             //Action
-            var responseGetBalance = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var responseGetBalance = await _walletProvider.BalanceCharge(notActiveUserId);
+
             //Assert
             Assert.Multiple(() =>
             {
@@ -144,10 +133,9 @@ namespace Task_9.Tests
         {
             //Precondition
             var notExistUserId = await _userProvider.GetNotExistUserId();
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(notExistUserId, 100);
-
+            
             //Action
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var responseBalanceCharge = await _walletProvider.GetBalance(notExistUserId);
             //Assert
             Assert.Multiple(() =>
             {
@@ -161,12 +149,10 @@ namespace Task_9.Tests
         public async Task T46_BalanceCharge_Charge0Amount_StatusCodeIsInternalServerError()
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, 0);
-
+            var activeUserId = await _userProvider.GetActiveUserId();
+            
             //Action
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, 0);
             //Assert
             var expectedMessage = "Amount cannot be '0'";
             Assert.Multiple(() =>
@@ -181,12 +167,10 @@ namespace Task_9.Tests
         public async Task T48_BalanceCharge_ChargeAmountWithPrecision2_StatusCodeIsInternalServerError()
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, 0.001m);
-
+            var activeUserId = await _userProvider.GetActiveUserId();
+            
             //Action
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, 0.001m);
             //Assert
             var expectedMessage = "Amount value must have precision 2 numbers after dot";
             Assert.Multiple(() =>
@@ -202,15 +186,11 @@ namespace Task_9.Tests
         public async Task T53_BalanceCharge_BalanceNAndChargeSomeAmountMore_BalanceIsPositiveAndStatusCodeIsOk(decimal balanceN, decimal amount)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest1 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, balanceN);
-            await _walletServiceClient.BalanceCharge(balanceChargeRequest1);
-            var balanceChargeRequest2 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
-
+            var activeUserId = await _userProvider.GetActiveUserId();
+            await _walletProvider.BalanceCharge(activeUserId, balanceN);
             //Action
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest2);
-            var responseGetBalance = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, amount);
+            var responseGetBalance = await _walletProvider.GetBalance(activeUserId);
             //Assert
             Assert.Multiple(() =>
             {
@@ -224,14 +204,10 @@ namespace Task_9.Tests
         public async Task T54_BalanceCharge_BalanceNAndChargeNegativeAmountMoreThanBalance_StatusCodeIsInternalServerError(decimal balanceN, decimal amount)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest1 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, balanceN);
-            await _walletServiceClient.BalanceCharge(balanceChargeRequest1);
-            var balanceChargeRequest2 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
-
+            var activeUserId = await _userProvider.GetActiveUserId();
+            await _walletProvider.BalanceCharge(activeUserId, balanceN);
             //Action
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest2);
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, amount);
             //Assert
             var expectedMessage = $"User have '{balanceN:0.0}', you try to charge '{amount:0.0}'.";
             Assert.Multiple(() =>
@@ -246,13 +222,10 @@ namespace Task_9.Tests
         public async Task T55_BalanceCharge_Balance0MinusSomeAmount_StatusCodeIsInternalServerError(decimal negativeAmount)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(
-                responseRegisterUser.Body, negativeAmount);
-
+            var activeUserId = await _userProvider.GetActiveUserId();
+          
             //Action
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, negativeAmount);
             //Assert
             var expectedMessage = $"User have '{0}', you try to charge '{negativeAmount:0.0}'.";
             Assert.Multiple(() =>
@@ -273,20 +246,13 @@ namespace Task_9.Tests
             decimal balanceN, decimal charge1, decimal charge2)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceNRequest = _balanceChargeGenerator.GenerateBalanceCharge(
-                responseRegisterUser.Body, balanceN);
-            await _walletServiceClient.BalanceCharge(balanceNRequest);
-            var balanceChargeRequest1 = _balanceChargeGenerator.GenerateBalanceCharge(
-                responseRegisterUser.Body, charge1);
-            await _walletServiceClient.BalanceCharge(balanceChargeRequest1);
-            var balanceChargeRequest2 = _balanceChargeGenerator.GenerateBalanceCharge(
-                responseRegisterUser.Body, charge2);
-
+            var activeUserId = await _userProvider.GetActiveUserId();
+            await _walletProvider.BalanceCharge(activeUserId, balanceN);
+            await _walletProvider.BalanceCharge(activeUserId, charge1);
+           
             //Action
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest2);
-            var responseGetBalance = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, charge2);
+            var responseGetBalance = await _walletProvider.GetBalance(activeUserId);
             //Assert
             Assert.Multiple(() =>
             {
@@ -300,13 +266,10 @@ namespace Task_9.Tests
         public async Task T47_BalanceCharge_Balance0ChargeAmountMoreThanMaxSum_StatusCodeIsInternalServerError(decimal inpossibleAmount)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(
-                responseRegisterUser.Body, inpossibleAmount);
-
+            var activeUserId = await _userProvider.GetActiveUserId();
+           
             //Action
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, inpossibleAmount);
             //Assert
             var expectedMessage = $"After this charge balance could be '{inpossibleAmount}', maximum user balance is '10000000'";
             Assert.Multiple(() =>
@@ -321,7 +284,7 @@ namespace Task_9.Tests
         public async Task T33_RevertTransaction_RevertTransactionWithWrongId_StatusCodeIsNotFound()
         {
             //Action
-            var responseRevertTransaction = await _walletServiceClient.RevertTransaction(new Guid());
+            var responseRevertTransaction = await _walletProvider.RevertWrongTransaction();
             //Assert
             var expectedMessage = "The given key was not present in the dictionary.";
             Assert.Multiple(() =>
@@ -341,14 +304,12 @@ namespace Task_9.Tests
         public async Task T34_36_39_RevertTransaction_TransactionWithSomeAmount_StatusCodeIsOk(decimal amount)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var expectedBalanceAfterRevert = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
-            var revertRequest = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var activeUserId = await _userProvider.GetActiveUserId();
+            var expectedBalanceAfterRevert = await _walletProvider.GetBalance(activeUserId);
+            var revertRequest = await _walletProvider.BalanceCharge(activeUserId, amount);
             //Action
-            await _walletServiceClient.RevertTransaction(revertRequest.Body);
-            var actualBalanceAfterRevert = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
+            await _walletProvider.RevertExistTransaction(revertRequest.Body);
+            var actualBalanceAfterRevert = await _walletProvider.GetBalance(activeUserId);
 
             //Assert
             Assert.Multiple(() =>
@@ -363,19 +324,15 @@ namespace Task_9.Tests
         public async Task T37_RevertTransaction_RevertTransactionWith10kkMore_StatusCodeIsOk(decimal amount1, decimal amount2)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount1);
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
-            balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount2);
-            await _walletServiceClient.BalanceCharge(balanceChargeRequest);
-            await _walletServiceClient.RevertTransaction(responseBalanceCharge.Body);
-            var expectedBalance = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
-            balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, 10000000.01m);
-            responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var activeUserId = await _userProvider.GetActiveUserId();
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, amount1);
+            await _walletProvider.BalanceCharge(activeUserId, amount2);
+            await _walletProvider.RevertExistTransaction(responseBalanceCharge.Body);
+            var expectedBalance = await _walletProvider.GetBalance(activeUserId);
+            responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, 10000000.01m);
             //Action
-            var responseRevertTransaction = await _walletServiceClient.RevertTransaction(responseBalanceCharge.Body);
-            var actualBalance = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
+            var responseRevertTransaction = await _walletProvider.RevertExistTransaction(responseBalanceCharge.Body);
+            var actualBalance = await _walletProvider.GetBalance(activeUserId);
 
             //Assert
             Assert.Multiple(() =>
@@ -390,14 +347,13 @@ namespace Task_9.Tests
         public async Task T38_RevertTransaction_RevertOfRevert_StatusCodeIsOk(decimal amount)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var activeUserId = await _userProvider.GetActiveUserId();
+            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(activeUserId, amount);
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, amount);
             //Action
-            var responseRevertTransaction = await _walletServiceClient.RevertTransaction(responseBalanceCharge.Body);
-            var responseRevertOfRevertTransaction = await _walletServiceClient.RevertTransaction(responseRevertTransaction.Body);
-            var actualBalance = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
+            var responseRevertTransaction = await _walletProvider.RevertExistTransaction(responseBalanceCharge.Body);
+            var responseRevertOfRevertTransaction = await _walletProvider.RevertExistTransaction(responseRevertTransaction.Body);
+            var actualBalance = await _walletProvider.GetBalance(activeUserId);
 
             //Assert
             Assert.Multiple(() =>
@@ -413,10 +369,9 @@ namespace Task_9.Tests
         public async Task T17_GetTransaction_UserIsActiveNotTransaction_StatusCodeIsOkTransactionCountIsZero()
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
+            var activeUserId = await _userProvider.GetActiveUserId();
             //Action
-            var responseTransaction = await _walletServiceClient.GetTransaction(responseRegisterUser.Body);
+            var responseTransaction = await _walletProvider.GetTransaction(activeUserId);
             //Assert
             Assert.Multiple(() =>
             {
@@ -430,12 +385,10 @@ namespace Task_9.Tests
         public async Task T18_GetTransaction_ChargeAmountOneTime_StatusCodeIsOkTransactionCountIsOne(decimal amount)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
-            var response = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var activeUserId = await _userProvider.GetActiveUserId();
+            var response = await _walletProvider.BalanceCharge(activeUserId, amount);
             //Action
-            var responseTransaction = await _walletServiceClient.GetTransaction(responseRegisterUser.Body);
+            var responseTransaction = await _walletProvider.GetTransaction(activeUserId);
             //Assert
             Assert.Multiple(() =>
             {
@@ -449,13 +402,11 @@ namespace Task_9.Tests
         public async Task T19_GetTransaction_ChargeAmountTwoTimes_StatusCodeIsOkTransactionCountIsTwo(decimal amount, int count)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
-            var response = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
-            response = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var activeUserId = await _userProvider.GetActiveUserId();
+            await _walletProvider.BalanceCharge(activeUserId, amount);
+            await _walletProvider.BalanceCharge(activeUserId, amount);
             //Action
-            var responseTransaction = await _walletServiceClient.GetTransaction(responseRegisterUser.Body);
+            var responseTransaction = await _walletProvider.GetTransaction(activeUserId);
             //Assert
             Assert.Multiple(() =>
             {
@@ -469,22 +420,20 @@ namespace Task_9.Tests
         public async Task T21_GetTransaction_CheckAllFields_AllFieldsIsCorrect(decimal amount)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
-            var responseChargeBalance = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var activeUserId = await _userProvider.GetActiveUserId();
+            var responseChargeBalance = await _walletProvider.BalanceCharge(activeUserId, amount);
             DateTimeZone desiredTimeZone = DateTimeZoneProviders.Tzdb["Etc/GMT"];
             ZonedDateTime currentZonedDateTime = SystemClock.Instance.GetCurrentInstant().InZone(desiredTimeZone);
             LocalDate expectedDate = currentZonedDateTime.Date;
             
             //Action
-            var responseTransaction = await _walletServiceClient.GetTransaction(responseRegisterUser.Body);
+            var responseTransaction = await _walletProvider.GetTransaction(activeUserId);
             //Assert
             
             LocalDate actualDate = LocalDate.FromDateTime(responseTransaction.Body[0].Time.Date);
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(responseRegisterUser.Body, responseTransaction.Body[0].UserId);
+                Assert.AreEqual(activeUserId, responseTransaction.Body[0].UserId);
                 Assert.AreEqual(amount, responseTransaction.Body[0].Amount);
                 Assert.AreEqual(responseChargeBalance.Body, responseTransaction.Body[0].TransactionId);
                 Assert.AreEqual(expectedDate, actualDate);
@@ -498,13 +447,11 @@ namespace Task_9.Tests
         public async Task T22_GetTransaction_MakeRevertAndGetTransaction_CountOfTransactionIsTwo(decimal amount)
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
-            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
-            var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
+            var activeUserId = await _userProvider.GetActiveUserId();
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, amount);
             //Action
-            var responseRevertTransaction = await _walletServiceClient.RevertTransaction(responseBalanceCharge.Body);
-            var responseGetTransaction = await _walletServiceClient.GetTransaction(responseRegisterUser.Body);
+            var responseRevertTransaction = await _walletProvider.RevertExistTransaction(responseBalanceCharge.Body);
+            var responseGetTransaction = await _walletProvider.GetTransaction(activeUserId);
 
             //Assert
             Assert.Multiple(() =>
@@ -523,9 +470,9 @@ namespace Task_9.Tests
         public async Task T30_GetTransaction_NotActiveUser_StatusCodeIsOkEmtyListOfTransaction()
         {
             //Precondition
-            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            var userId = await _userProvider.GetNotActiveUserId();
             //Action
-            var responseGetBalance = await _walletServiceClient.GetTransaction(responseRegisterUser.Body);
+            var responseGetBalance = await _walletProvider.GetTransaction(userId);
             //Assert
             Assert.Multiple(() =>
             {
@@ -541,7 +488,7 @@ namespace Task_9.Tests
             //Precondition
             var notExistUserId = await _userProvider.GetNotExistUserId();
             //Action
-            var responseGetBalance = await _walletServiceClient.GetTransaction(notExistUserId);
+            var responseGetBalance = await _walletProvider.GetTransaction(notExistUserId);
             //Assert
             Assert.Multiple(() =>
             {
@@ -552,3 +499,4 @@ namespace Task_9.Tests
 
     }
 }
+ 

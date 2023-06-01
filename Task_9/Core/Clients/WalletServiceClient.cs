@@ -14,16 +14,16 @@ using Task_9.Tests;
 
 namespace Task_9.Core.Clients
 {
-    public class WalletServiceClient: IWalletServiceClient, IObservable<Int32>
+    public class WalletServiceClient: IWalletServiceClient, IObservable<int>
     {
         private static readonly Lazy<WalletServiceClient> _lazyClient = new Lazy<WalletServiceClient>(() => new WalletServiceClient());
         public static WalletServiceClient Instance => _lazyClient.Value;
         private readonly HttpClient _client = new HttpClient();
         private readonly string _baseUrl = "https://walletservice-uat.azurewebsites.net";
-        private readonly ConcurrentBag<IObserver<Int32>> _chargeBalanceObservers = new ConcurrentBag<IObserver<Int32>>();
+        private readonly ConcurrentBag<IObserver<int>> _chargeBalanceObservers = new ConcurrentBag<IObserver<int>>();
 
 
-        public async Task<CommonResponse<decimal>> GetBalance(Int32 userId)
+        public async Task<CommonResponse<decimal>> GetBalance(int userId)
         {
             var httpRequestMessage = new HttpRequestMessage
             {
@@ -67,7 +67,7 @@ namespace Task_9.Core.Clients
             return await response.ToCommonResponse<Guid>();
         }
 
-        public async Task<CommonResponse<List<GetTransactionInfoResponse>>> GetTransaction(Int32 userId)
+        public async Task<CommonResponse<List<GetTransactionInfoResponse>>> GetTransaction(int userId)
         {
             var httpRequestMessage = new HttpRequestMessage
             {
@@ -86,10 +86,10 @@ namespace Task_9.Core.Clients
             return null;
         }
 
-        public void NotifyChargeBalanceObservers(Int32 userId)
+        public void NotifyChargeBalanceObservers(int userId)
         {
 
-            foreach (IObserver<Int32> observer in _chargeBalanceObservers)
+            foreach (IObserver<int> observer in _chargeBalanceObservers)
             {
                 observer.OnNext(userId);
             }

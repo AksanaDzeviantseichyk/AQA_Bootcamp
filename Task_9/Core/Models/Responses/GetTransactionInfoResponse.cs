@@ -4,7 +4,7 @@ namespace Task_9.Core.Models.Responses
 {
     public class GetTransactionInfoResponse
     {
-        public Int32 UserId { get; set; }
+        public int UserId { get; set; }
         public decimal Amount { get; set; }
         public Guid TransactionId { get; set; }
         public DateTime Time { get; set; }

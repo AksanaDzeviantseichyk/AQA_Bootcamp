@@ -14,5 +14,7 @@ namespace Task_9.Tests
     {
         protected readonly IUserServiceProvider _userProvider 
             = new UserServiceProvider(UserServiceClient.Instance, new Core.Utils.UserGenerator());
+        protected readonly IWalletServiceProvider _walletProvider
+            = new WalletServiceProvider(WalletServiceClient.Instance, new Core.Utils.BalanceChargeGenerator());
     }
 }
