@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Task_9.Core.Contracts;
 using Task_9.Core.Extensions;
 using Task_9.Core.Models.Requests;
 using Task_9.Core.Models.Responses.Base;
@@ -12,7 +13,7 @@ using Task_9.Tests;
 
 namespace Task_9.Core.Clients
 {
-    public class UserServiceClient: IObservable<Int32>
+    public class UserServiceClient: IUserServiceClient, IObservable<Int32>
     {
         private static readonly Lazy<UserServiceClient> _lazyClient = new Lazy<UserServiceClient>(() => new UserServiceClient());
         public static UserServiceClient Instance => _lazyClient.Value;

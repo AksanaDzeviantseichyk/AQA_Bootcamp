@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Task_9.Core.Models.Requests;
+using Task_9.Core.Models.Responses.Base;
+
+namespace Task_9.Core.Contracts
+{
+    public interface IUserServiceClient
+    {
+        Task<CommonResponse<int>> RegisterNewUser(RegisterNewUserRequest request);
+        Task<CommonResponse<object>> DeleteUser(Int32 userId);
+        Task<CommonResponse<object>> SetUserStatus(Int32 userId, bool newStatus);
+        Task<CommonResponse<bool>> GetUserStatus(Int32 userId);
+    }
+}

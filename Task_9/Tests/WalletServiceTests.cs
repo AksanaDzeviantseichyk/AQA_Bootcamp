@@ -9,12 +9,10 @@ using System;
 
 namespace Task_9.Tests
 {
-    public class WalletServiceTests
+    public class WalletServiceTests: BaseTest
     {
         private readonly WalletServiceClient _walletServiceClient = WalletServiceClient.Instance;
         private readonly BalanceChargeGenerator _balanceChargeGenerator = new BalanceChargeGenerator();
-        private readonly UserServiceClient _userServiceClient = UserServiceClient.Instance;
-        private readonly UserGenerator _userGenerator = new UserGenerator();
         private readonly string _notActiveUserMessage = "not active user";
 
         [Test]
@@ -22,8 +20,7 @@ namespace Task_9.Tests
         public async Task T1_2_15_GetBalance_NewNotActiveUserNoTransaction_StatusCodeIsInternalServerError()
         {
             //Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
             //Action
             var responseGetBalance = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
             //Assert
@@ -39,10 +36,9 @@ namespace Task_9.Tests
         public async Task T3_GetBalance_NotExistUser_StatusCodeIsInternalServerError()
         {
             //Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var notExistUserId = await _userProvider.GetNotExistUserId();
             //Action
-            var responseGetBalance = await _walletServiceClient.GetBalance(responseRegisterUser.Body + 10);
+            var responseGetBalance = await _walletServiceClient.GetBalance(notExistUserId);
             //Assert
             Assert.Multiple(() =>
             {
@@ -60,9 +56,8 @@ namespace Task_9.Tests
         public async Task T10_12_13_49_GetBalance_OneTransictionWithSomePositiveAmount_StatusCodeIsOk(decimal amount)
         {
             //Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest1 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
             //Action
             var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest1);
@@ -83,9 +78,8 @@ namespace Task_9.Tests
         public async Task T11_14_BalanceCharge_OneTransactionWithSomeNegativeAmount_StatusCodeIsInternalServerError(decimal negativeAmount)
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(
                 responseRegisterUser.Body, negativeAmount);
 
@@ -105,9 +99,9 @@ namespace Task_9.Tests
         public async Task T16_35_GetBalance_RevertOneTransactionAndGetBalance_BalanceIsEqualPreviousValue(decimal balance, decimal amountRevert)
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
+           
             var balanceChargeRequest1 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, balance);
             await _walletServiceClient.BalanceCharge(balanceChargeRequest1);
             var expectedBalanceAfterRevert = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
@@ -131,8 +125,7 @@ namespace Task_9.Tests
         public async Task T43_BalanceCharge_NotActiveUser_StatusCodeIsInternalServerError()
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, 100);
 
             //Action
@@ -150,9 +143,8 @@ namespace Task_9.Tests
         public async Task T44_BalanceCharge_NotExistUser_StatusCodeIsInternalServerError()
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body + 10, 100);
+            var notExistUserId = await _userProvider.GetNotExistUserId();
+            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(notExistUserId, 100);
 
             //Action
             var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
@@ -169,9 +161,8 @@ namespace Task_9.Tests
         public async Task T46_BalanceCharge_Charge0Amount_StatusCodeIsInternalServerError()
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, 0);
 
             //Action
@@ -190,9 +181,8 @@ namespace Task_9.Tests
         public async Task T48_BalanceCharge_ChargeAmountWithPrecision2_StatusCodeIsInternalServerError()
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, 0.001m);
 
             //Action
@@ -212,9 +202,8 @@ namespace Task_9.Tests
         public async Task T53_BalanceCharge_BalanceNAndChargeSomeAmountMore_BalanceIsPositiveAndStatusCodeIsOk(decimal balanceN, decimal amount)
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest1 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, balanceN);
             await _walletServiceClient.BalanceCharge(balanceChargeRequest1);
             var balanceChargeRequest2 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
@@ -235,9 +224,8 @@ namespace Task_9.Tests
         public async Task T54_BalanceCharge_BalanceNAndChargeNegativeAmountMoreThanBalance_StatusCodeIsInternalServerError(decimal balanceN, decimal amount)
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest1 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, balanceN);
             await _walletServiceClient.BalanceCharge(balanceChargeRequest1);
             var balanceChargeRequest2 = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
@@ -258,9 +246,8 @@ namespace Task_9.Tests
         public async Task T55_BalanceCharge_Balance0MinusSomeAmount_StatusCodeIsInternalServerError(decimal negativeAmount)
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(
                 responseRegisterUser.Body, negativeAmount);
 
@@ -286,9 +273,8 @@ namespace Task_9.Tests
             decimal balanceN, decimal charge1, decimal charge2)
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceNRequest = _balanceChargeGenerator.GenerateBalanceCharge(
                 responseRegisterUser.Body, balanceN);
             await _walletServiceClient.BalanceCharge(balanceNRequest);
@@ -314,9 +300,8 @@ namespace Task_9.Tests
         public async Task T47_BalanceCharge_Balance0ChargeAmountMoreThanMaxSum_StatusCodeIsInternalServerError(decimal inpossibleAmount)
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(
                 responseRegisterUser.Body, inpossibleAmount);
 
@@ -356,9 +341,8 @@ namespace Task_9.Tests
         public async Task T34_36_39_RevertTransaction_TransactionWithSomeAmount_StatusCodeIsOk(decimal amount)
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var expectedBalanceAfterRevert = await _walletServiceClient.GetBalance(responseRegisterUser.Body);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
             var revertRequest = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
@@ -379,9 +363,8 @@ namespace Task_9.Tests
         public async Task T37_RevertTransaction_RevertTransactionWith10kkMore_StatusCodeIsOk(decimal amount1, decimal amount2)
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount1);
             var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
             balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount2);
@@ -407,9 +390,8 @@ namespace Task_9.Tests
         public async Task T38_RevertTransaction_RevertOfRevert_StatusCodeIsOk(decimal amount)
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
             var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
             //Action
@@ -431,9 +413,8 @@ namespace Task_9.Tests
         public async Task T17_GetTransaction_UserIsActiveNotTransaction_StatusCodeIsOkTransactionCountIsZero()
         {
             //Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
-            var activeUser = await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             //Action
             var responseTransaction = await _walletServiceClient.GetTransaction(responseRegisterUser.Body);
             //Assert
@@ -449,9 +430,8 @@ namespace Task_9.Tests
         public async Task T18_GetTransaction_ChargeAmountOneTime_StatusCodeIsOkTransactionCountIsOne(decimal amount)
         {
             //Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
-            var activeUser = await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
             var response = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
             //Action
@@ -469,9 +449,8 @@ namespace Task_9.Tests
         public async Task T19_GetTransaction_ChargeAmountTwoTimes_StatusCodeIsOkTransactionCountIsTwo(decimal amount, int count)
         {
             //Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
-            var activeUser = await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
             var response = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
             response = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
@@ -490,9 +469,8 @@ namespace Task_9.Tests
         public async Task T21_GetTransaction_CheckAllFields_AllFieldsIsCorrect(decimal amount)
         {
             //Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
-            var activeUser = await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
             var responseChargeBalance = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
             DateTimeZone desiredTimeZone = DateTimeZoneProviders.Tzdb["Etc/GMT"];
@@ -520,9 +498,8 @@ namespace Task_9.Tests
         public async Task T22_GetTransaction_MakeRevertAndGetTransaction_CountOfTransactionIsTwo(decimal amount)
         {
             //Precondition
-            var userRequest = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(userRequest);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
             var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(responseRegisterUser.Body, amount);
             var responseBalanceCharge = await _walletServiceClient.BalanceCharge(balanceChargeRequest);
             //Action
@@ -546,8 +523,7 @@ namespace Task_9.Tests
         public async Task T30_GetTransaction_NotActiveUser_StatusCodeIsOkEmtyListOfTransaction()
         {
             //Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
             //Action
             var responseGetBalance = await _walletServiceClient.GetTransaction(responseRegisterUser.Body);
             //Assert
@@ -563,10 +539,9 @@ namespace Task_9.Tests
         public async Task T31_GetTransaction_NotExistUser_StatusCodeIsOkEmtyListOfTransaction()
         {
             //Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var notExistUserId = await _userProvider.GetNotExistUserId();
             //Action
-            var responseGetBalance = await _walletServiceClient.GetTransaction(responseRegisterUser.Body + 10);
+            var responseGetBalance = await _walletServiceClient.GetTransaction(notExistUserId);
             //Assert
             Assert.Multiple(() =>
             {

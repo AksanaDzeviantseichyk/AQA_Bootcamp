@@ -6,10 +6,8 @@ using Task_9.Core.Utils;
 
 namespace Task_9.Tests
 {
-    public class UserServiceTests
+    public class UserServiceTests: BaseTest
     {
-        private readonly UserServiceClient _userServiceClient = UserServiceClient.Instance;
-        private readonly UserGenerator _userGenerator = new UserGenerator();
         private readonly string _noElementsMessage = "Sequence contains no elements";
         private readonly string _cannotFindUserIdMessage = "Specified argument was out of the range of valid values. (Parameter 'cannot find user with this id')";
 
@@ -37,7 +35,8 @@ namespace Task_9.Tests
         public async Task T1to7_RegisterNewUser_NewValidUser_StatusCodeIsSuccsses(RegisterNewUserRequest request)
         {
             // Action
-            var response = await _userServiceClient.RegisterNewUser(request);
+            var response = await _userProvider.RegisterValidUser(request);
+            
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, response.Status,
                 $"User with FirstName = {request.FirstName} and LastName = {request.LastName} IS NOT register");
@@ -47,13 +46,10 @@ namespace Task_9.Tests
         //8
         public async Task T8_RegisterNewUser_SomeNewValidUsers_ReturningUserIdIsAutoincremented()
         {
-            // Precondition
-            var request1 = _userGenerator.GenerateRegisterNewUserRequest();
-
             // Action
-            var responseRegisterUser1 = await _userServiceClient.RegisterNewUser(request1);
-            var responseRegisterUser2 = await _userServiceClient.RegisterNewUser(request1);
-            var responseRegisterUser3 = await _userServiceClient.RegisterNewUser(request1);
+            var responseRegisterUser1 = await _userProvider.RegisterValidUser();
+            var responseRegisterUser2 = await _userProvider.RegisterValidUser();
+            var responseRegisterUser3 = await _userProvider.RegisterValidUser();
 
             // Assert
             Assert.Multiple(() =>
@@ -68,13 +64,11 @@ namespace Task_9.Tests
         //9
         public async Task T9_DeleteUser_RegisterNewUser_DeleteExistUserAndRegisterNewValidUser_NewUserIdIsIncremented()
         {
-            // Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
             // Action
-            var responseRegisterUser1 = await _userServiceClient.RegisterNewUser(request);
-            var responseDeleteUser1 = await _userServiceClient.DeleteUser(responseRegisterUser1.Body);
-            var responseGetStatusDeletedUser1 = await _userServiceClient.GetUserStatus(responseRegisterUser1.Body);
-            var responseRegisterUser2 = await _userServiceClient.RegisterNewUser(request);
+            var responseRegisterUser1 = await _userProvider.RegisterValidUser();
+            var responseDeleteUser1 = await _userProvider.DeleteExistUser(responseRegisterUser1.Body);
+            var responseGetStatusDeletedUser1 = await _userProvider.GetStatusNotExistUser(responseRegisterUser1.Body);
+            var responseRegisterUser2 = await _userProvider.RegisterValidUser();
             // Assert
             Assert.Multiple(() =>
             {
@@ -89,11 +83,9 @@ namespace Task_9.Tests
         //10
         public async Task T10_GetUserStatus_NotExistRegisterUser_StatusCodeIsNotFound()
         {
-            // Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var notExistUserId = await _userProvider.GetNotExistUserId();
             // Action
-            var responseGetUserStatus = await _userServiceClient.GetUserStatus(responseRegisterUser.Body + 10);
+            var responseGetUserStatus = await _userProvider.GetStatusNotExistUser(notExistUserId);
             // Assert
             Assert.Multiple(() =>
             {
@@ -107,10 +99,9 @@ namespace Task_9.Tests
         public async Task T11_RegisterNewUser_GetUserStatus_DefaultUserStatus_UserStatusIsFalse(bool defaultUserStatus)
         {
             // Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
             // Action
-            var responseGetUserStatus = await _userServiceClient.GetUserStatus(responseRegisterUser.Body);
+            var responseGetUserStatus = await _userProvider.GetStatusExistUser(responseRegisterUser.Body);
             // Assert
             Assert.AreEqual(defaultUserStatus, responseGetUserStatus.Body);
         }
@@ -120,11 +111,10 @@ namespace Task_9.Tests
         public async Task T13_15_SetUserStatus_GetUserStatus_ChangeUserStatusFromFalseToTrue_UserStatusIsTrue()
         {
             // Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
             // Action
-            var responseSetUserStatus = await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
-            var responseGetUserStatus = await _userServiceClient.GetUserStatus(responseRegisterUser.Body);
+            var responseSetUserStatus = await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
+            var responseGetUserStatus = await _userProvider.GetStatusExistUser(responseRegisterUser.Body);
             // Assert
             Assert.Multiple(() =>
             {
@@ -140,12 +130,11 @@ namespace Task_9.Tests
         public async Task T12_16_SetUserStatus_GetUserStatus_ChangeUserStatusFalseTrueFalse_UserStatusIsFalse()
         {
             // Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
             // Action
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
-            var responseSetUserStatus = await _userServiceClient.SetUserStatus(responseRegisterUser.Body, false);
-            var responseGetUserStatus = await _userServiceClient.GetUserStatus(responseRegisterUser.Body);
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
+            var responseSetUserStatus = await _userProvider.SetFalseStatusExistUser(responseRegisterUser.Body);
+            var responseGetUserStatus = await _userProvider.GetStatusExistUser(responseRegisterUser.Body);
             // Assert
             Assert.Multiple(() =>
             {
@@ -160,10 +149,9 @@ namespace Task_9.Tests
         public async Task T14_SetUserStatus_NotExistRegisterUser_StatusCodeNotFound()
         {
             // Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var notExistUserId = await _userProvider.GetNotExistUserId();
             // Action
-            var responseSetUserStatus = await _userServiceClient.SetUserStatus(responseRegisterUser.Body + 10, true);
+            var responseSetUserStatus = await _userProvider.SetTrueStatusNotExistUser(notExistUserId);
             // Assert
             Assert.Multiple(() =>
             {
@@ -177,13 +165,12 @@ namespace Task_9.Tests
         public async Task T17_SetUserStatus_GetUserStatus_ChangeUserStatusFalseTrueFalseTrue_UserStatusIsFalse()
         {
             // Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
             // Action
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, false);
-            var responseSetUserStatus = await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
-            var responseGetUserStatus = await _userServiceClient.GetUserStatus(responseRegisterUser.Body);
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
+            await _userProvider.SetFalseStatusExistUser(responseRegisterUser.Body);
+            var responseSetUserStatus = await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
+            var responseGetUserStatus = await _userProvider.GetStatusExistUser(responseRegisterUser.Body);
             // Assert
             Assert.Multiple(() =>
             {
@@ -198,11 +185,10 @@ namespace Task_9.Tests
         public async Task T18_SetUserStatus_GetUserStatus_ChangeUserStatusFalseToFalse_UserStatusIsFalse()
         {
             // Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
             // Action
-            var responseSetUserStatus = await _userServiceClient.SetUserStatus(responseRegisterUser.Body, false);
-            var responseGetUserStatus = await _userServiceClient.GetUserStatus(responseRegisterUser.Body);
+            var responseSetUserStatus = await _userProvider.SetFalseStatusExistUser(responseRegisterUser.Body);
+            var responseGetUserStatus = await _userProvider.GetStatusExistUser(responseRegisterUser.Body);
             // Assert
             Assert.Multiple(() =>
             {
@@ -217,12 +203,11 @@ namespace Task_9.Tests
         public async Task T19_SetUserStatus_GetUserStatus_ChangeUserStatusTrueToTrue_UserStatusIsTrue()
         {
             // Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
             // Action
-            await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
-            var responseSetUserStatus = await _userServiceClient.SetUserStatus(responseRegisterUser.Body, true);
-            var responseGetUserStatus = await _userServiceClient.GetUserStatus(responseRegisterUser.Body);
+            await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
+            var responseSetUserStatus = await _userProvider.SetTrueStatusExistUser(responseRegisterUser.Body);
+            var responseGetUserStatus = await _userProvider.GetStatusExistUser(responseRegisterUser.Body);
             // Assert
             Assert.Multiple(() =>
             {
@@ -237,10 +222,9 @@ namespace Task_9.Tests
         public async Task T20_DeleteUser_NotActiveUser_StatusCodeIsOK()
         {
             // Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var responseRegisterUser = await _userProvider.RegisterValidUser();
             // Action
-            var responseDeleteUser = await _userServiceClient.DeleteUser(responseRegisterUser.Body);
+            var responseDeleteUser = await _userProvider.DeleteExistUser(responseRegisterUser.Body);
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, responseDeleteUser.Status);
 
@@ -251,10 +235,9 @@ namespace Task_9.Tests
         public async Task T21_DeleteUser_NotExistRegisterUser_StatusCodeIsInternalServerError()
         {
             // Precondition
-            var request = _userGenerator.GenerateRegisterNewUserRequest();
-            var responseRegisterUser = await _userServiceClient.RegisterNewUser(request);
+            var notExistUserId = await _userProvider.GetNotExistUserId();
             // Action
-            var responseDeleteUser = await _userServiceClient.DeleteUser(responseRegisterUser.Body + 10);
+            var responseDeleteUser = await _userProvider.DeleteNotExistUser(notExistUserId);
             // Assert
             Assert.Multiple(() =>
             {

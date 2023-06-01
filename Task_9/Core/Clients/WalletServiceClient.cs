@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Task_9.Core.Contracts;
 using Task_9.Core.Extensions;
 using Task_9.Core.Models.Requests;
 using Task_9.Core.Models.Responses;
@@ -13,7 +14,7 @@ using Task_9.Tests;
 
 namespace Task_9.Core.Clients
 {
-    public class WalletServiceClient : IObservable<Int32>
+    public class WalletServiceClient: IWalletServiceClient, IObservable<Int32>
     {
         private static readonly Lazy<WalletServiceClient> _lazyClient = new Lazy<WalletServiceClient>(() => new WalletServiceClient());
         public static WalletServiceClient Instance => _lazyClient.Value;
