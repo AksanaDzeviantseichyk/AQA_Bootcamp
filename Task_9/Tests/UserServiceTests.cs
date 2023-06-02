@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using System.Net;
-using Task_9.Core.Clients;
 using Task_9.Core.Models.Requests;
 using Task_9.Core.Utils;
 

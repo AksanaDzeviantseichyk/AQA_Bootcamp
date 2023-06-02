@@ -1,18 +1,12 @@
 ﻿using NUnit.Framework;
 using System.Net;
-using Bogus;
-using Task_9.Core.Clients;
 using Task_9.Core.Enum;
-using Task_9.Core.Utils;
 using NodaTime;
-using System;
 
 namespace Task_9.Tests
 {
     public class WalletServiceTests: BaseTest
     {
-        private readonly WalletServiceClient _walletServiceClient = WalletServiceClient.Instance;
-        private readonly BalanceChargeGenerator _balanceChargeGenerator = new BalanceChargeGenerator();
         private readonly string _notActiveUserMessage = "not active user";
 
         [Test]
@@ -96,9 +90,9 @@ namespace Task_9.Tests
             var activeUserId = await _userProvider.GetActiveUserId();
             await _walletProvider.BalanceCharge(activeUserId, balance);
             var expectedBalanceAfterRevert = await _walletProvider.GetBalance(activeUserId);
-            var revertRequest = await _walletProvider.BalanceCharge(activeUserId, amountRevert);
+            var revertTransactionId = await _walletProvider.GetChargeTransactionId(activeUserId, amountRevert);
             //Action
-            await _walletProvider.RevertExistTransaction(revertRequest.Body);
+            await _walletProvider.RevertExistTransaction(revertTransactionId);
             var actualBalanceAfterRevert = await _walletProvider.GetBalance(activeUserId);
 
             //Assert
@@ -306,9 +300,9 @@ namespace Task_9.Tests
             //Precondition
             var activeUserId = await _userProvider.GetActiveUserId();
             var expectedBalanceAfterRevert = await _walletProvider.GetBalance(activeUserId);
-            var revertRequest = await _walletProvider.BalanceCharge(activeUserId, amount);
+            var revertTransactionId = await _walletProvider.GetChargeTransactionId(activeUserId, amount);
             //Action
-            await _walletProvider.RevertExistTransaction(revertRequest.Body);
+            await _walletProvider.RevertExistTransaction(revertTransactionId);
             var actualBalanceAfterRevert = await _walletProvider.GetBalance(activeUserId);
 
             //Assert
@@ -325,13 +319,13 @@ namespace Task_9.Tests
         {
             //Precondition
             var activeUserId = await _userProvider.GetActiveUserId();
-            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, amount1);
+            var revertTransactionId = await _walletProvider.GetChargeTransactionId(activeUserId, amount1);
             await _walletProvider.BalanceCharge(activeUserId, amount2);
-            await _walletProvider.RevertExistTransaction(responseBalanceCharge.Body);
+            await _walletProvider.RevertExistTransaction(revertTransactionId);
             var expectedBalance = await _walletProvider.GetBalance(activeUserId);
-            responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, 10000000.01m);
+            revertTransactionId = await _walletProvider.GetChargeTransactionId(activeUserId, 10000000.01m);
             //Action
-            var responseRevertTransaction = await _walletProvider.RevertExistTransaction(responseBalanceCharge.Body);
+            var responseRevertTransaction = await _walletProvider.RevertExistTransaction(revertTransactionId);
             var actualBalance = await _walletProvider.GetBalance(activeUserId);
 
             //Assert
@@ -348,10 +342,9 @@ namespace Task_9.Tests
         {
             //Precondition
             var activeUserId = await _userProvider.GetActiveUserId();
-            var balanceChargeRequest = _balanceChargeGenerator.GenerateBalanceCharge(activeUserId, amount);
-            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, amount);
+            var revertTransactionId = await _walletProvider.GetChargeTransactionId(activeUserId, amount);
             //Action
-            var responseRevertTransaction = await _walletProvider.RevertExistTransaction(responseBalanceCharge.Body);
+            var responseRevertTransaction = await _walletProvider.RevertExistTransaction(revertTransactionId);
             var responseRevertOfRevertTransaction = await _walletProvider.RevertExistTransaction(responseRevertTransaction.Body);
             var actualBalance = await _walletProvider.GetBalance(activeUserId);
 
@@ -421,7 +414,7 @@ namespace Task_9.Tests
         {
             //Precondition
             var activeUserId = await _userProvider.GetActiveUserId();
-            var responseChargeBalance = await _walletProvider.BalanceCharge(activeUserId, amount);
+            var expectedTransactionId = await _walletProvider.GetChargeTransactionId(activeUserId, amount);
             DateTimeZone desiredTimeZone = DateTimeZoneProviders.Tzdb["Etc/GMT"];
             ZonedDateTime currentZonedDateTime = SystemClock.Instance.GetCurrentInstant().InZone(desiredTimeZone);
             LocalDate expectedDate = currentZonedDateTime.Date;
@@ -435,7 +428,7 @@ namespace Task_9.Tests
             {
                 Assert.AreEqual(activeUserId, responseTransaction.Body[0].UserId);
                 Assert.AreEqual(amount, responseTransaction.Body[0].Amount);
-                Assert.AreEqual(responseChargeBalance.Body, responseTransaction.Body[0].TransactionId);
+                Assert.AreEqual(expectedTransactionId, responseTransaction.Body[0].TransactionId);
                 Assert.AreEqual(expectedDate, actualDate);
                 Assert.AreEqual(TransactionStatus.NotReverted, responseTransaction.Body[0].Status);
                 Assert.AreEqual(null, responseTransaction.Body[0].BaseTransactionId);
@@ -448,9 +441,9 @@ namespace Task_9.Tests
         {
             //Precondition
             var activeUserId = await _userProvider.GetActiveUserId();
-            var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, amount);
+            var transactionId = await _walletProvider.GetChargeTransactionId(activeUserId, amount);
             //Action
-            var responseRevertTransaction = await _walletProvider.RevertExistTransaction(responseBalanceCharge.Body);
+            var responseRevertTransaction = await _walletProvider.RevertExistTransaction(transactionId);
             var responseGetTransaction = await _walletProvider.GetTransaction(activeUserId);
 
             //Assert

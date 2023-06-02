@@ -1,11 +1,6 @@
 ﻿using NUnit.Framework;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Task_9.Core.Clients;
+using Task_9.Core.Observers;
 
 namespace Task_9.Tests
 {
@@ -16,6 +11,7 @@ namespace Task_9.Tests
         private DeleteAndChargeObserver _deleteAndChargeObserver;
         private UserServiceClient _userClient;
         private WalletServiceClient _walletClient;
+
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {

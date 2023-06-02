@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
 
-namespace Task_9.Tests
+namespace Task_9.Core.Observers
 {
     public class DeleteAndChargeObserver : IObserver<int>
     {

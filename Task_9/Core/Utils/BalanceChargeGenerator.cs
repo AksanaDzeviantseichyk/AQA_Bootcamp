@@ -31,10 +31,6 @@ namespace Task_9.Core.Utils
                 Amount = (decimal)random.NextDouble() * _max
         };
 
-        //public IEnumerable<BalanceChargeRequest> GetSomeAmountBalanceCharge(int userId)
-        //{
-        //    ret
-        //};
         }
     }
 }

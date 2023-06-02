@@ -9,7 +9,7 @@ using Task_9.Core.Contracts;
 using Task_9.Core.Extensions;
 using Task_9.Core.Models.Requests;
 using Task_9.Core.Models.Responses.Base;
-using Task_9.Tests;
+using Task_9.Core.Observers;
 
 namespace Task_9.Core.Clients
 {

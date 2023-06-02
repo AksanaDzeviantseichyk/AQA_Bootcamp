@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Task_9.Tests
+namespace Task_9.Core.Observers
 {
     public class RegisterUserObserver : IObserver<int>
     {
