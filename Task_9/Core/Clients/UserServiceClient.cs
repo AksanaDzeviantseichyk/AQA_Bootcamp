@@ -1,10 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Task_9.Core.Contracts;
 using Task_9.Core.Extensions;
 using Task_9.Core.Models.Requests;
@@ -15,8 +11,6 @@ namespace Task_9.Core.Clients
 {
     public class UserServiceClient: IUserServiceClient, IObservable<int>
     {
-        private static readonly Lazy<UserServiceClient> _lazyClient = new Lazy<UserServiceClient>(() => new UserServiceClient());
-        public static UserServiceClient Instance => _lazyClient.Value;
         private readonly HttpClient _client = new HttpClient();
         private readonly string _baseUrl = "https://userservice-uat.azurewebsites.net";
         private readonly ConcurrentBag<RegisterUserObserver> _registerUserObservers = new ConcurrentBag<RegisterUserObserver>();

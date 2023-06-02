@@ -1,27 +1,19 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Task_9.Core.Contracts;
 using Task_9.Core.Extensions;
 using Task_9.Core.Models.Requests;
 using Task_9.Core.Models.Responses;
 using Task_9.Core.Models.Responses.Base;
-using Task_9.Tests;
 
 namespace Task_9.Core.Clients
 {
     public class WalletServiceClient: IWalletServiceClient, IObservable<int>
     {
-        private static readonly Lazy<WalletServiceClient> _lazyClient = new Lazy<WalletServiceClient>(() => new WalletServiceClient());
-        public static WalletServiceClient Instance => _lazyClient.Value;
         private readonly HttpClient _client = new HttpClient();
         private readonly string _baseUrl = "https://walletservice-uat.azurewebsites.net";
         private readonly ConcurrentBag<IObserver<int>> _chargeBalanceObservers = new ConcurrentBag<IObserver<int>>();
-
 
         public async Task<CommonResponse<decimal>> GetBalance(int userId)
         {
@@ -35,7 +27,6 @@ namespace Task_9.Core.Clients
 
             return await response.ToCommonResponse<decimal>();
         }
-
         public async Task<CommonResponse<Guid>> BalanceCharge(BalanceChargeRequest request)
         {
             var httpRequestMessage = new HttpRequestMessage

@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Autofac;
+using NUnit.Framework;
 using System.Net;
 using Task_9.Core.Models.Requests;
 using Task_9.Core.Utils;
@@ -12,7 +13,7 @@ namespace Task_9.Tests
 
         private static IEnumerable<TestCaseData> ValidUserInfo()
         {
-            UserGenerator userGenerator = new UserGenerator();
+            UserGenerator userGenerator = _scope.Resolve<UserGenerator>(); ;
             //1
             yield return new TestCaseData(userGenerator.GenerateEmptyUserFieldsRequest());
             //2
@@ -244,8 +245,6 @@ namespace Task_9.Tests
                 Assert.AreEqual(HttpStatusCode.InternalServerError, responseDeleteUser.Status);
                 Assert.AreEqual(_noElementsMessage, responseDeleteUser.Content);
             });
-
         }
-
     }
 }
