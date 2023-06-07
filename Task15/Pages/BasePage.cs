@@ -45,7 +45,7 @@ namespace Task15.Pages
             return new CheckoutPage();
         }
 
-        public ProductListPage OpenGearCategoryPage()
+        public GearPage OpenGearCategoryPage()
         {
             var element = _driver.FindElement(_gearCategoryButtonLocator);
             element.Click();
@@ -54,7 +54,7 @@ namespace Task15.Pages
 
             wait.Until((driver) => driver.Title.StartsWith("Gear"));
 
-            return new ProductListPage();
+            return new GearPage();
         }
 
 

@@ -60,7 +60,11 @@ namespace Task15.Tests
         [Test]
         public void TC2_OpenMainPageOpenRegistrationPageCreateAccountWithoutEmailCheckErrorMessage_ErrorMessageArrears()
         {
-           
+            var registrationPage = _homePage.ClickCreateAccountButton();
+            CreateAccountData createAccountData = new CreateAccountDataGenerator().GenerateCreateAccountData();
+            registrationPage.FillInPersonalInformatFieldWithoutEmail(createAccountData);
+            registrationPage.ClickCreateAccountButton();
+            Assert.IsTrue(registrationPage.ErrorRequiredEmailMessageIsExist());
 
         }
 
@@ -70,7 +74,7 @@ namespace Task15.Tests
             var customerLoginPage = _homePage.ClickSignInButton();
             LoginTestData loginTestData = LoginTestDataReader.ReadLoginTestData();
             customerLoginPage.Login(loginTestData);
-            var productListPage = _homePage.OpenGearCategoryPage();
+            var gearPage = _homePage.OpenGearCategoryPage();
 
         }
 

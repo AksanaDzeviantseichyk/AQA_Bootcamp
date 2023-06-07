@@ -82,7 +82,7 @@ namespace Task15.Pages
         {
             try
             {
-               
+                _driver.FindElement(_newAddressButtonLocator);
                 return true;
             }
             catch (NoSuchElementException)
