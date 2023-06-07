@@ -6,7 +6,7 @@ using SeleniumExtras.WaitHelpers;
 
 namespace Task15.Pages
 {
-    public class ProductListPage: BasePage
+    public class ProductListPage : BasePage
     {
         private By _productInfoElementLocator = By.ClassName("product-item-info");
         private By _productInfoNames = By.ClassName("product-item-link");
@@ -39,7 +39,35 @@ namespace Task15.Pages
             productAddToCartButton.Click();
             wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
         }
+        public void AddProductToCartByNumber(int productNumber)
+        {
+            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(4));
+            var productList = wait.Until(drv => drv.FindElements(_productInfoElementLocator));
+            IWebElement targetProduct = productList[productNumber];
+            Actions actions = new Actions(_driver);
+            actions.MoveToElement(targetProduct);
+            actions.Perform();
 
+            IWebElement productAddToCartButton = targetProduct.FindElement(_toCartButton);
 
+            productAddToCartButton.Click();
+            wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
+        }
+
+        public ProductPage OpenProductByNumber(int productNumber)
+        {
+            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(4));
+            var productList = wait.Until(drv => drv.FindElements(_productInfoElementLocator));
+            IWebElement targetProduct = productList[productNumber];
+            Actions actions = new Actions(_driver);
+            actions.MoveToElement(targetProduct);
+            actions.Perform();
+
+            //IWebElement productAddToCartButton = targetProduct.FindElement(_toCartButton);
+
+            targetProduct.Click();
+            // wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
+            return new ProductPage();
+        }
     }
 }

@@ -75,6 +75,12 @@ namespace Task15.Tests
             LoginTestData loginTestData = LoginTestDataReader.ReadLoginTestData();
             customerLoginPage.Login(loginTestData);
             var gearPage = _homePage.OpenGearCategoryPage();
+            var productListPage = gearPage.ClickBagsCategoryButton();
+            productListPage.AddProductToCartByNumber(0);
+            productListPage.AddProductToCartByNumber(1);
+            var productPage = productListPage.OpenProductByNumber(2);
+            productPage.ClickAddToCartButton();
+            Assert.AreEqual("3", productPage.GetCounterValue());
 
         }
 
