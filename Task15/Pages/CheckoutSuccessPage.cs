@@ -14,8 +14,7 @@ namespace Task15.Pages
 
         public string GetOrderNumber()
         {
-            
-            return _driver.FindElement(_orderNumberLocator).Text;
+           return _driver.FindElement(_orderNumberLocator).Text;
         }
 
         public void ClickContinueShoppingButton()

@@ -15,8 +15,20 @@ namespace Task15.Pages
         private By _cartIconLocator = By.ClassName("minicart-wrapper");
        
         protected IWebDriver _driver => DriverSingleton.Driver;
-           
 
+        protected void MoveToElement(IWebElement element)
+        {
+            Actions actions = new Actions(_driver);
+            actions.MoveToElement(element);
+            actions.Perform();
+        }
+
+        protected void ScrollToElement(IWebElement element)
+        {
+            Actions actions = new Actions(_driver);
+            actions.ScrollToElement(element);
+            actions.Perform();
+        }
         public ProductListPage ClickGearSubmenuItem(string subMenuName)
         {
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
@@ -38,8 +50,10 @@ namespace Task15.Pages
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(6));
             wait.Until(ExpectedConditions.ElementIsVisible(_cartIconLocator));
             var cartIconButton = _driver.FindElement(_cartIconLocator);
+            ScrollToElement(cartIconButton);
             cartIconButton.Click();
             var proceedToCheckoutButton = wait.Until(ExpectedConditions.ElementIsVisible(_proceedToCheckoutButtonLocator));
+            MoveToElement(proceedToCheckoutButton);
             proceedToCheckoutButton.Click();
             wait.Until((driver) => driver.Title.StartsWith("Checkout"));
             return new CheckoutPage();

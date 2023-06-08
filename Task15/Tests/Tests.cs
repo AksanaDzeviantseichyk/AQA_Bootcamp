@@ -24,22 +24,25 @@ namespace Task15.Tests
             _homePage = new HomePage();
         }
 
-        [Test]
-        public void TC1_SignInValidUserAddedProductsToCartCreateOrderCheckOrderData_OrderDataIsCorrect()
+        [TestCase("Watches", "Dash Digital Watch")]
+        public void TC1_SignInValidUserAddedProductsToCartCreateOrderCheckOrderData_OrderDataIsCorrect(string submenuName, string productName)
         {
             var customerLoginPage = _homePage.ClickSignInButton();
 
             LoginTestData loginTestData = LoginTestDataReader.ReadLoginTestData();
             _homePage = customerLoginPage.Login(loginTestData);
 
-            var productListPage = _homePage.ClickGearSubmenuItem("Watches");
+            var productListPage = _homePage.ClickGearSubmenuItem(submenuName);
 
-            productListPage.AddProductToCart("Dash Digital Watch");
+            productListPage.AddProductToCartByName(productName);
 
             var checkoutPage = productListPage.ClickProceedToCheckoutButton();
 
             ShippingAddress shippingAddress = new ShippingAddressGenerator().GenerateShippingAddress();
             checkoutPage.FillShippingAddress(shippingAddress);
+            var subtotalExpected = checkoutPage.GetCartSubtotalAmount();
+            var shippingExpected = checkoutPage.GetShippingAmount();
+            var orderTotalExpected = checkoutPage.GetOrderTotalAmount();    
             var checkoutSuccess = checkoutPage.ClickPlaceOrderButton();
             var orderNumber = checkoutSuccess.GetOrderNumber();
             checkoutSuccess.ClickContinueShoppingButton();
@@ -50,10 +53,10 @@ namespace Task15.Tests
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("Dash Digital Watch", orderPage.GetProductsName());
-                Assert.AreEqual("$92.00", orderPage.GetSubtotalAmount());
-                Assert.AreEqual("$5.00", orderPage.GetShippingAmount());
-                Assert.AreEqual("$97.00", orderPage.GetGrandTotalAmount());
+                Assert.AreEqual(productName, orderPage.GetProductsName());
+                Assert.AreEqual(subtotalExpected, orderPage.GetSubtotalAmount());
+                Assert.AreEqual(shippingExpected, orderPage.GetShippingAmount());
+                Assert.AreEqual(orderTotalExpected, orderPage.GetGrandTotalAmount());
             });
         }
 
@@ -65,11 +68,10 @@ namespace Task15.Tests
             registrationPage.FillInPersonalInformatFieldWithoutEmail(createAccountData);
             registrationPage.ClickCreateAccountButton();
             Assert.IsTrue(registrationPage.ErrorRequiredEmailMessageIsExist());
-
         }
 
-        [Test]
-        public void TC3_OpenMainPageAddToCartThreeBagsCheckCardIcon_CartIconHasRightNumber()
+        [TestCase("3")]
+        public void TC3_OpenMainPageAddToCartThreeBagsCheckCardIcon_CartIconHasRightNumber(string expectedCount)
         {
             var customerLoginPage = _homePage.ClickSignInButton();
             LoginTestData loginTestData = LoginTestDataReader.ReadLoginTestData();
@@ -80,8 +82,7 @@ namespace Task15.Tests
             productListPage.AddProductToCartByNumber(1);
             var productPage = productListPage.OpenProductByNumber(2);
             productPage.ClickAddToCartButton();
-            Assert.AreEqual("3", productPage.GetCounterValue());
-
+            Assert.AreEqual(expectedCount, productPage.GetCounterValue());
         }
 
         [TearDown]

@@ -1,11 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Task15.Pages
 {
@@ -18,10 +13,10 @@ namespace Task15.Pages
         public void ClickAddToCartButton()
         {
             //WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(8));
-            var addToCartButton = _driver.FindElement(_addToCartButtonLocator);//wait.Until(ExpectedConditions.ElementIsVisible(_addToCartButtonLocator));
+            //wait.Until(ExpectedConditions.ElementIsVisible(_addToCartButtonLocator));
+            var addToCartButton = _driver.FindElement(_addToCartButtonLocator);
             addToCartButton.Click();
         }
-
         public string GetCounterValue()
         {
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(8));

@@ -22,26 +22,25 @@ namespace Task15.Pages
         private By _shipHereButtonLocator = By.ClassName("action-save-address");
         private By _loaderLocator = By.ClassName(".loader");
         private By _placeOrderLocator = By.CssSelector(".action.primary.checkout");
+        private By _cartSubtotalLocator = By.CssSelector("[data-th='Cart Subtotal']");
+        private By _shippingLocator = By.CssSelector("[data-th='Shipping']");
+        private By _orderTotalLocator = By.CssSelector("[data-th='Order Total']");
 
         public void ClickNewAddressButton()
         {
             var button = _driver.FindElement(_newAddressButtonLocator);
+            ScrollToElement(button);
             button.Click();
         }
         public void FillInShippingAdsressForm(ShippingAddress shippingAddress)
         {
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(8));
             wait.Until(ExpectedConditions.ElementIsVisible(_streetInputLocator));
-            var inputField = _driver.FindElement(_streetInputLocator);
-            inputField.SendKeys(shippingAddress.Street);
-            inputField = _driver.FindElement(_cityInputLocator);
-            inputField.SendKeys(shippingAddress.City);
-            inputField = _driver.FindElement(_countrySelectLocator);
-            inputField.SendKeys(shippingAddress.Country);
-            inputField = _driver.FindElement(_postalCodeInputLocator);
-            inputField.SendKeys(shippingAddress.PostalCode);
-            inputField = _driver.FindElement(_phoneNumberInputLocator);
-            inputField.SendKeys(shippingAddress.PhoneNumber);
+            FillInStreet(shippingAddress.Street);
+            FillInCity(shippingAddress.City);
+            FillInCountry(shippingAddress.Country);
+            FillInPostalCode(shippingAddress.PostalCode);
+            FillInPhoneNumber(shippingAddress.PhoneNumber);
         }
         public void ClickShipHere()
         {
@@ -52,7 +51,7 @@ namespace Task15.Pages
         public void FillShippingAddress(ShippingAddress shippingAddress)
         {
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));//(By.CssSelector("loading-element-selector")));
+            wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
 
             if (ElementExists())
             {
@@ -60,7 +59,6 @@ namespace Task15.Pages
                 FillInShippingAdsressForm(shippingAddress);
                 ClickShipHere();
                 ClickNextButton();
-
             }
             else
             {
@@ -75,6 +73,7 @@ namespace Task15.Pages
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(6));
             wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));// By.CssSelector("loading-element-selector")));
             var nextButton = _driver.FindElement(_nextButtonLocator);
+            ScrollToElement(nextButton);
             nextButton.Click();
             
         }
@@ -99,5 +98,47 @@ namespace Task15.Pages
             return new CheckoutSuccessPage();
         }
 
+        public void FillInCity(string city)
+        {
+            var inputField = _driver.FindElement(_cityInputLocator);
+            inputField.SendKeys(city);
+        }
+
+        public void FillInStreet(string street)
+        {
+            var inputField = _driver.FindElement(_streetInputLocator);
+            inputField.SendKeys(street);
+        }
+        public void FillInCountry(string country)
+        {
+            var inputField = _driver.FindElement(_countrySelectLocator);
+            inputField.SendKeys(country);
+        }
+
+        public void FillInPhoneNumber(string phone)
+        {
+            var inputField = _driver.FindElement(_phoneNumberInputLocator);
+            inputField.SendKeys(phone);
+        }
+        public void FillInPostalCode(string postalCode)
+        {
+            var inputField = _driver.FindElement(_postalCodeInputLocator);
+            inputField.SendKeys(postalCode);
+        }
+
+        public string GetCartSubtotalAmount()
+        {
+            return _driver.FindElement(_cartSubtotalLocator).Text;
+        }
+
+        public string GetShippingAmount()
+        {
+            return _driver.FindElement(_shippingLocator).Text;
+        }
+
+        public string GetOrderTotalAmount()
+        {
+            return _driver.FindElement(_orderTotalLocator).Text;
+        }
     }
 }

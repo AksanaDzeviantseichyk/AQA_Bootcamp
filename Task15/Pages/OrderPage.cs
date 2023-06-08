@@ -16,27 +16,21 @@ namespace Task15.Pages
 
         public string GetProductsName()
         {
-            string result = _driver.FindElement(_productNameLocator).Text;
-            return result;
+            return _driver.FindElement(_productNameLocator).Text; 
         }
 
         public string GetSubtotalAmount()
         {
-            string result = _driver.FindElement(_subtotalValueLocator).Text;
-            return _driver.FindElement(_subtotalValueLocator).Text;
+           return _driver.FindElement(_subtotalValueLocator).Text;
         }
 
         public string GetShippingAmount()
         {
-            string result = _driver.FindElement(_shippingValueLocator).Text;
-
             return _driver.FindElement(_shippingValueLocator).Text;
         }
         public string GetGrandTotalAmount()
         {
-            string result = _driver.FindElement(_grandTotalValueLocator).Text;
-
-            return _driver.FindElement(_grandTotalValueLocator).Text;
+           return _driver.FindElement(_grandTotalValueLocator).Text;
         }
 
     }

@@ -16,13 +16,10 @@ namespace Task15.Pages
         public void ScrollToProducts()
         {
             var elements = _driver.FindElements(_productInfoElementLocator);
-
-            Actions actions = new Actions(_driver);
-            actions.ScrollToElement(elements.First());
-            actions.Perform();
+            ScrollToElement(elements.First());
         }
 
-        public void AddProductToCart(string productName)
+        public void AddProductToCartByName(string productName)
         {
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
             wait.Until(drv => drv.FindElement(_productInfoElementLocator));
@@ -30,10 +27,8 @@ namespace Task15.Pages
                 .FindElements(_productInfoElementLocator)
                 .Where(i => i.FindElement(_productInfoNames).Text.Equals(productName)).First();
 
-            Actions actions = new Actions(_driver);
-            actions.MoveToElement(targetProduct);
-            actions.Perform();
-
+            MoveToElement(targetProduct);
+            
             IWebElement productAddToCartButton = targetProduct.FindElement(_toCartButton);
 
             productAddToCartButton.Click();
@@ -44,10 +39,8 @@ namespace Task15.Pages
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(4));
             var productList = wait.Until(drv => drv.FindElements(_productInfoElementLocator));
             IWebElement targetProduct = productList[productNumber];
-            Actions actions = new Actions(_driver);
-            actions.MoveToElement(targetProduct);
-            actions.Perform();
-
+            MoveToElement(targetProduct);
+            
             IWebElement productAddToCartButton = targetProduct.FindElement(_toCartButton);
 
             productAddToCartButton.Click();
@@ -59,15 +52,15 @@ namespace Task15.Pages
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(4));
             var productList = wait.Until(drv => drv.FindElements(_productInfoElementLocator));
             IWebElement targetProduct = productList[productNumber];
-            Actions actions = new Actions(_driver);
-            actions.MoveToElement(targetProduct);
-            actions.Perform();
-
+            MoveToElement(targetProduct);
+            
             //IWebElement productAddToCartButton = targetProduct.FindElement(_toCartButton);
 
             targetProduct.Click();
             // wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
             return new ProductPage();
         }
+
+       
     }
 }
