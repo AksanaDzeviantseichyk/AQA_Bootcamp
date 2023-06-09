@@ -1,5 +1,4 @@
-﻿
-namespace Task15.Models
+﻿namespace Task15.Models
 {
     public class CreateAccountData
     {

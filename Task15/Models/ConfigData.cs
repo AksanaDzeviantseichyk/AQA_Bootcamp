@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Task15.Enum;
+﻿using Task15.Enum;
 
 namespace Task15.Models
 {
@@ -15,6 +10,5 @@ namespace Task15.Models
         public int SmallWait { get; set; }
         public int MediumWait { get; set; }
         public int LargeWait { get; set; }
-
     }
 }

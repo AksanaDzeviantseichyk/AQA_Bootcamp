@@ -1,5 +1,4 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using Task15.Models;
 
@@ -25,7 +24,7 @@ namespace Task15.Pages
             var button = _driver.FindElement(_newAddressButtonLocator);
             ScrollToElement(button);
             _wait.Until(ExpectedConditions.ElementToBeClickable(button));
-           button.Click();
+            button.Click();
         }
         public void FillInShippingAdsressForm(ShippingAddress shippingAddress)
         {
@@ -58,36 +57,31 @@ namespace Task15.Pages
             {
                 FillInShippingAdsressForm(shippingAddress);
                 ClickNextButton();
-            }
-            
+            }            
         }
-
         public void ClickNextButton()
         {
-            //
-            _wait.Until(ExpectedConditions.ElementToBeClickable(_loaderLocator));
+            _wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
+            _wait.Until(ExpectedConditions.ElementToBeClickable(_nextButtonLocator));
             var nextButton = _driver.FindElement(_nextButtonLocator);
             ScrollToElement(nextButton);
             nextButton.Click();
             _wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
-
-        }
-        
+        }        
         public CheckoutSuccessPage ClickPlaceOrderButton()
         {
             _wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
             var placeOrderButton = _driver.FindElement(_placeOrderLocator);
             placeOrderButton.Click();
             _wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
+
             return new CheckoutSuccessPage();
         }
-
         public void FillInCity(string city)
         {
             var inputField = _driver.FindElement(_cityInputLocator);
             inputField.SendKeys(city);
         }
-
         public void FillInStreet(string street)
         {
             var inputField = _driver.FindElement(_streetInputLocator);
@@ -98,7 +92,6 @@ namespace Task15.Pages
             var inputField = _driver.FindElement(_countrySelectLocator);
             inputField.SendKeys(country);
         }
-
         public void FillInPhoneNumber(string phone)
         {
             var inputField = _driver.FindElement(_phoneNumberInputLocator);
@@ -109,17 +102,15 @@ namespace Task15.Pages
             var inputField = _driver.FindElement(_postalCodeInputLocator);
             inputField.SendKeys(postalCode);
         }
-
         public string GetCartSubtotalAmount()
         {
+            _wait.Until(ExpectedConditions.ElementIsVisible(_cartSubtotalLocator));
             return _driver.FindElement(_cartSubtotalLocator).Text;
         }
-
         public string GetShippingAmount()
         {
             return _driver.FindElement(_shippingLocator).Text;
         }
-
         public string GetOrderTotalAmount()
         {
             return _driver.FindElement(_orderTotalLocator).Text;

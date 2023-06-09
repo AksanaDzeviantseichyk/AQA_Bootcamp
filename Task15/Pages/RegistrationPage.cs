@@ -20,20 +20,17 @@ namespace Task15.Pages
             FillInPassword(accountData.Password);
             FillInConfirmationPassword(accountData.Password);
         }
-
         public void FillInFirstName(string firstName)
         {
             _wait.Until(ExpectedConditions.ElementIsVisible(_firstNameInputLocator));
             var inputField = _driver.FindElement(_firstNameInputLocator);
             inputField.SendKeys(firstName);
         }
-
         public void FillInLastName(string lastName)
         {
             var inputField = _driver.FindElement(_lastNameInputLocator);
             inputField.SendKeys(lastName);
         }
-
         public void FillInPassword(string password)
         {
             var inputField = _driver.FindElement(_passwordInputLocator);
@@ -44,13 +41,11 @@ namespace Task15.Pages
             var inputField = _driver.FindElement(_confirmationPasswordInputLocator);
             inputField.SendKeys(confirmationPassword);
         }
-
         public void ClickCreateAccountButton()
         {
             var createButton = _driver.FindElement(_createAccountButtonLocator);
             createButton.Click();
         }
-
         public bool ErrorRequiredEmailMessageIsExist()
         {
             try

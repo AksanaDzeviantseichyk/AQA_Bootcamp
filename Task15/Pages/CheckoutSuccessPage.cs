@@ -1,6 +1,5 @@
 ﻿using OpenQA.Selenium;
 
-
 namespace Task15.Pages
 {
     public class CheckoutSuccessPage:BasePage
@@ -12,7 +11,6 @@ namespace Task15.Pages
         {
            return _driver.FindElement(_orderNumberLocator).Text;
         }
-
         public void ClickContinueShoppingButton()
         {
             var continueShoppingButton = _driver.FindElement(_continueShoppingButtonLocator);

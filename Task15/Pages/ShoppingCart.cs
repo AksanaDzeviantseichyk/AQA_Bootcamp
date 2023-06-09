@@ -1,7 +1,6 @@
 ﻿using OpenQA.Selenium;
 using SeleniumExtras.WaitHelpers;
 
-
 namespace Task15.Pages
 {
     public class ShoppingCart: BasePage
@@ -16,9 +15,7 @@ namespace Task15.Pages
             {
                 deleteButtons.First().Click();
                 DeleteAllProduct();
-            }
-            
+            }        
         }
-
     }
 }

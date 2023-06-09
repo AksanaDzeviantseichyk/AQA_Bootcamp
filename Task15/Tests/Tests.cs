@@ -1,6 +1,4 @@
 ﻿using NUnit.Framework;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using Task15.Driver;
 using Task15.Models;
 using Task15.Pages;
@@ -15,7 +13,6 @@ namespace Task15.Tests
         [SetUp]
         public void SetUp()
         {
-            ConfigData _configData = ConfigDataReader.ReadConfigData("Resourses\\ConfigData.json");
             DriverSingleton.InitializeDriver();
             _homePage = new HomePage();
         }
@@ -24,22 +21,23 @@ namespace Task15.Tests
         public void TC1_SignInValidUserAddedProductsToCartCreateOrderCheckOrderData_OrderDataIsCorrect
             (string loginDataFilePath, string submenuName, string productName)
         {
-            var customerLoginPage = _homePage.ClickSignInButton();
-
+            //Preconditin
             LoginTestData loginTestData = LoginTestDataReader.ReadLoginTestData(loginDataFilePath);
+            ShippingAddress shippingAddress = new ShippingAddressGenerator().GenerateShippingAddress();
+
+            //Action
+            var customerLoginPage = _homePage.ClickSignInButton();
             _homePage = customerLoginPage.Login(loginTestData);
 
             var productListPage = _homePage.ClickGearSubmenuItem(submenuName);
-
             productListPage.AddProductToCartByName(productName);
 
-            var checkoutPage = productListPage.ClickProceedToCheckoutButton();
-
-            ShippingAddress shippingAddress = new ShippingAddressGenerator().GenerateShippingAddress();
+            var checkoutPage = productListPage.ClickProceedToCheckoutButton(); 
             checkoutPage.FillShippingAddress(shippingAddress);
             var subtotalExpected = checkoutPage.GetCartSubtotalAmount();
             var shippingExpected = checkoutPage.GetShippingAmount();
-            var orderTotalExpected = checkoutPage.GetOrderTotalAmount();    
+            var orderTotalExpected = checkoutPage.GetOrderTotalAmount();  
+            
             var checkoutSuccess = checkoutPage.ClickPlaceOrderButton();
             var orderNumber = checkoutSuccess.GetOrderNumber();
             checkoutSuccess.ClickContinueShoppingButton();
@@ -48,6 +46,7 @@ namespace Task15.Tests
             var myOrdersPage = myAccountPage.ClickMyOrdersButton();
             var orderPage = myOrdersPage.ClickViewOrderButton(orderNumber);
 
+            //Assert
             Assert.Multiple(() =>
             {
                 Assert.AreEqual(productName, orderPage.GetProductsName());
@@ -60,29 +59,42 @@ namespace Task15.Tests
         [Test]
         public void TC2_OpenMainPageOpenRegistrationPageCreateAccountWithoutEmailCheckErrorMessage_ErrorMessageArrears()
         {
-            var registrationPage = _homePage.ClickCreateAccountButton();
+            //Precondition
             CreateAccountData createAccountData = new CreateAccountDataGenerator().GenerateCreateAccountData();
+
+            //Action
+            var registrationPage = _homePage.ClickCreateAccountButton();
             registrationPage.FillInPersonalInformatFieldWithoutEmail(createAccountData);
             registrationPage.ClickCreateAccountButton();
+
+            //Assert
             Assert.IsTrue(registrationPage.ErrorRequiredEmailMessageIsExist());
         }
 
         [TestCase("Resourses\\TC3_LoginTestData.json", "3")]
         public void TC3_OpenMainPageAddToCartThreeBagsCheckCardIcon_CartIconHasRightNumber(string loginDatafilePath, string expectedCount)
         {
-            var customerLoginPage = _homePage.ClickSignInButton();
+            //Precondition
             LoginTestData loginTestData = LoginTestDataReader.ReadLoginTestData(loginDatafilePath);
+
+            //Action
+            var customerLoginPage = _homePage.ClickSignInButton();
             customerLoginPage.Login(loginTestData);
+
             var gearPage = _homePage.OpenGearCategoryPage();
+
             var productListPage = gearPage.ClickBagsCategoryButton();
             productListPage.AddProductToCartByNumber(0);
             productListPage.AddProductToCartByNumber(1);
+
             var productPage = productListPage.OpenProductByNumber(2);
             productPage.ClickAddToCartButton();
             var actualCount = productPage.GetCounterValue();
+
             var shoppingCart = _homePage.ClickViewEditCartButton();
             shoppingCart.DeleteAllProduct();
 
+            //Assert
             Assert.AreEqual(expectedCount, actualCount);
         }
 
@@ -91,6 +103,5 @@ namespace Task15.Tests
         {
             DriverSingleton.QuitDriver();
         }
-
     }
 }

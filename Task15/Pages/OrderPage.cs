@@ -13,12 +13,10 @@ namespace Task15.Pages
         {
             return _driver.FindElement(_productNameLocator).Text; 
         }
-
         public string GetSubtotalAmount()
         {
            return _driver.FindElement(_subtotalValueLocator).Text;
         }
-
         public string GetShippingAmount()
         {
             return _driver.FindElement(_shippingValueLocator).Text;
@@ -27,6 +25,5 @@ namespace Task15.Pages
         {
            return _driver.FindElement(_grandTotalValueLocator).Text;
         }
-
     }
 }

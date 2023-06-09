@@ -11,17 +11,17 @@ namespace Task15.Pages
         protected IWebDriver _driver; 
         protected WebDriverWait _wait;
 
-        private By _gearCategoryButtonLocator = By.Id("ui-id-6");
+        protected By _gearCategoryButtonLocator = By.Id("ui-id-6");
         protected By _welcomeMessageLocator = By.ClassName("logged-in");
-        private By _gearSubmenuItemsLocator = By.CssSelector(".level0.nav-4 li");
-        private By _proceedToCheckoutButtonLocator = By.Id("top-cart-btn-checkout");
-        private By _cartIconLocator = By.ClassName("minicart-wrapper");
-        private By _signInButtonLocator = By.ClassName("authorization-link");
-        private By _createAccountButtonLocator = By.XPath("//a[contains(text(),'Create an Account')]");
-        private By _switchButtonLocator = By.ClassName("switch");
-        private By _myAccountButtonLocator = By.XPath("//a[contains(text(), 'My Account')]");
+        protected By _gearSubmenuItemsLocator = By.CssSelector(".level0.nav-4 li");
+        protected By _proceedToCheckoutButtonLocator = By.Id("top-cart-btn-checkout");
+        protected By _cartIconLocator = By.ClassName("minicart-wrapper");
+        protected By _signInButtonLocator = By.ClassName("authorization-link");
+        protected By _createAccountLocator = By.XPath("//a[contains(text(),'Create an Account')]");
+        protected By _switchButtonLocator = By.ClassName("switch");
+        protected By _myAccountButtonLocator = By.XPath("//a[contains(text(), 'My Account')]");
         protected By _loaderLocator = By.ClassName("loader");
-        private By _viewAndEditCartButtonLocator = By.ClassName("viewcart");
+        protected By _viewAndEditCartButtonLocator = By.ClassName("viewcart");
 
         public BasePage()
         {
@@ -45,7 +45,6 @@ namespace Task15.Pages
             try
             {
                 _wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
-                
                 _driver.FindElement(locator);
                 return true;
             }
@@ -63,7 +62,7 @@ namespace Task15.Pages
         }
         public RegistrationPage ClickCreateAccountButton()
         {
-            var createAccountButton = _driver.FindElement(_createAccountButtonLocator);
+            var createAccountButton = _driver.FindElement(_createAccountLocator);
             createAccountButton.Click();
 
             return new RegistrationPage();
@@ -90,8 +89,8 @@ namespace Task15.Pages
             IWebElement targetGearSubmenu = gearSubmenuItems.FirstOrDefault(i => i.Text.Equals(subMenuName));
             _wait.Until(ExpectedConditions.ElementToBeClickable(targetGearSubmenu));
             targetGearSubmenu.Click();
-
             _wait.Until((driver) => !driver.Title.StartsWith("Home Page"));
+
             return new ProductListPage();
         }
         public void ClickCartIcon()
@@ -100,27 +99,24 @@ namespace Task15.Pages
             var cartIconButton = _driver.FindElement(_cartIconLocator);
             ScrollToElement(cartIconButton);
             cartIconButton.Click();
-           // _wait.Until(ExpectedConditions.ElementIsVisible(_cartIconLocator));
         }
         public CheckoutPage ClickProceedToCheckoutButton()
         {
             ClickCartIcon();
-            //
             _wait.Until(ExpectedConditions.ElementToBeClickable(_proceedToCheckoutButtonLocator));
             var proceedToCheckoutButton = _driver.FindElement(_proceedToCheckoutButtonLocator);
-            
             _wait.Until(ExpectedConditions.ElementIsVisible(_proceedToCheckoutButtonLocator));
             proceedToCheckoutButton.Click();
             _wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
             _wait.Until((driver) => driver.Title.StartsWith("Checkout"));
+
             return new CheckoutPage();
         }
 
         public GearPage OpenGearCategoryPage()
         {
             var element = _driver.FindElement(_gearCategoryButtonLocator);
-            element.Click();
-                   
+            element.Click();                   
             _wait.Until((driver) => driver.Title.StartsWith("Gear"));
 
             return new GearPage();
@@ -136,6 +132,5 @@ namespace Task15.Pages
             }
             return new ShoppingCart();
         }
-
     }
 }
