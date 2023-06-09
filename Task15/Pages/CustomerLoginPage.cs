@@ -1,5 +1,5 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 using Task15.Models;
 
 namespace Task15.Pages
@@ -32,10 +32,12 @@ namespace Task15.Pages
 
         public void ClickSignInButton()
         {
-            var element = _driver.FindElement(_signInFormButtonLocator);
+            
+            var element = _wait.Until(ExpectedConditions.ElementToBeClickable(_signInFormButtonLocator));
             element.Click();
-            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(4));
-            wait.Until((driver) => !driver.Title.StartsWith("Customer Login "));
+            _wait.Until((driver) => driver.FindElement(_welcomeMessageLocator).Text.StartsWith("Welcome, "));
+
+
         }
     }
 }

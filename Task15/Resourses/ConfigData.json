@@ -1,0 +1,12 @@
+{
+  "baseUrl": "https://magento.softwaretestingboard.com/",
+  "browserName": "CHROME",
+  "options": [
+    "--incognito",
+    "--start-maximized",
+    "headless"
+  ],
+  "smallWait": 1,
+  "mediumWait": 6,
+  "largeWait": 8
+ }

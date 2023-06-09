@@ -1,11 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Task15.Models;
 
 namespace Task15.Pages
@@ -20,7 +15,6 @@ namespace Task15.Pages
         private By _nextButtonLocator = By.ClassName("button");
         private By _newAddressButtonLocator = By.ClassName("action-show-popup");
         private By _shipHereButtonLocator = By.ClassName("action-save-address");
-        private By _loaderLocator = By.ClassName(".loader");
         private By _placeOrderLocator = By.CssSelector(".action.primary.checkout");
         private By _cartSubtotalLocator = By.CssSelector("[data-th='Cart Subtotal']");
         private By _shippingLocator = By.CssSelector("[data-th='Shipping']");
@@ -30,30 +24,30 @@ namespace Task15.Pages
         {
             var button = _driver.FindElement(_newAddressButtonLocator);
             ScrollToElement(button);
-            button.Click();
+            _wait.Until(ExpectedConditions.ElementToBeClickable(button));
+           button.Click();
         }
         public void FillInShippingAdsressForm(ShippingAddress shippingAddress)
         {
-            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(8));
-            wait.Until(ExpectedConditions.ElementIsVisible(_streetInputLocator));
+            _wait.Until(ExpectedConditions.ElementIsVisible(_streetInputLocator));
             FillInStreet(shippingAddress.Street);
             FillInCity(shippingAddress.City);
             FillInCountry(shippingAddress.Country);
             FillInPostalCode(shippingAddress.PostalCode);
             FillInPhoneNumber(shippingAddress.PhoneNumber);
+            _wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
         }
         public void ClickShipHere()
         {
-            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(6));
-            var button = wait.Until(drv => drv.FindElement(_shipHereButtonLocator));
+            var button = _wait.Until(drv => drv.FindElement(_shipHereButtonLocator));
             button.Click();
+            _wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
         }
         public void FillShippingAddress(ShippingAddress shippingAddress)
         {
-            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
+            _wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
 
-            if (ElementExists())
+            if (ElementExists(_newAddressButtonLocator))
             {
                 ClickNewAddressButton();
                 FillInShippingAdsressForm(shippingAddress);
@@ -70,31 +64,21 @@ namespace Task15.Pages
 
         public void ClickNextButton()
         {
-            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(6));
-            wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));// By.CssSelector("loading-element-selector")));
+            //
+            _wait.Until(ExpectedConditions.ElementToBeClickable(_loaderLocator));
             var nextButton = _driver.FindElement(_nextButtonLocator);
             ScrollToElement(nextButton);
             nextButton.Click();
-            
+            _wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
+
         }
-        private bool ElementExists()
-        {
-            try
-            {
-                _driver.FindElement(_newAddressButtonLocator);
-                return true;
-            }
-            catch (NoSuchElementException)
-            {
-                return false;
-            }
-        }
+        
         public CheckoutSuccessPage ClickPlaceOrderButton()
         {
-            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(6));
-            wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
+            _wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
             var placeOrderButton = _driver.FindElement(_placeOrderLocator);
             placeOrderButton.Click();
+            _wait.Until(ExpectedConditions.InvisibilityOfElementLocated(_loaderLocator));
             return new CheckoutSuccessPage();
         }
 

@@ -1,11 +1,5 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Task15.Models;
 
 namespace Task15.Pages
@@ -29,8 +23,7 @@ namespace Task15.Pages
 
         public void FillInFirstName(string firstName)
         {
-            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(8));
-            wait.Until(ExpectedConditions.ElementIsVisible(_firstNameInputLocator));
+            _wait.Until(ExpectedConditions.ElementIsVisible(_firstNameInputLocator));
             var inputField = _driver.FindElement(_firstNameInputLocator);
             inputField.SendKeys(firstName);
         }

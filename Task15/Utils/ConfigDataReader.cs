@@ -1,17 +1,22 @@
 ﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Task15.Models;
 
 namespace Task15.Utils
 {
-    public static class LoginTestDataReader
+    public class ConfigDataReader
     {
-        public static LoginTestData ReadLoginTestData(string filePath)
+        public static ConfigData ReadConfigData(string filePath)
         {
             try
             {
                 string jsonData = File.ReadAllText(filePath);
-                LoginTestData testData = JsonConvert.DeserializeObject<LoginTestData>(jsonData);
-                return testData;
+                ConfigData configData = JsonConvert.DeserializeObject<ConfigData>(jsonData);
+                return configData;
             }
             catch (FileNotFoundException ex)
             {

@@ -10,26 +10,23 @@ namespace Task15.Tests
 {
     public class Tests
     {
-        private IWebDriver _driver => DriverSingleton.Driver;
         private HomePage _homePage;
-
 
         [SetUp]
         public void SetUp()
         {
-            string baseUrl = "https://magento.softwaretestingboard.com/";
-            _driver.Navigate().GoToUrl(baseUrl);
-            _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(6);
-                     
+            ConfigData _configData = ConfigDataReader.ReadConfigData("Resourses\\ConfigData.json");
+            DriverSingleton.InitializeDriver();
             _homePage = new HomePage();
         }
 
-        [TestCase("Watches", "Dash Digital Watch")]
-        public void TC1_SignInValidUserAddedProductsToCartCreateOrderCheckOrderData_OrderDataIsCorrect(string submenuName, string productName)
+        [TestCase("Resourses\\TC1_LoginTestData.json", "Watches", "Dash Digital Watch")]
+        public void TC1_SignInValidUserAddedProductsToCartCreateOrderCheckOrderData_OrderDataIsCorrect
+            (string loginDataFilePath, string submenuName, string productName)
         {
             var customerLoginPage = _homePage.ClickSignInButton();
 
-            LoginTestData loginTestData = LoginTestDataReader.ReadLoginTestData();
+            LoginTestData loginTestData = LoginTestDataReader.ReadLoginTestData(loginDataFilePath);
             _homePage = customerLoginPage.Login(loginTestData);
 
             var productListPage = _homePage.ClickGearSubmenuItem(submenuName);
@@ -70,11 +67,11 @@ namespace Task15.Tests
             Assert.IsTrue(registrationPage.ErrorRequiredEmailMessageIsExist());
         }
 
-        [TestCase("3")]
-        public void TC3_OpenMainPageAddToCartThreeBagsCheckCardIcon_CartIconHasRightNumber(string expectedCount)
+        [TestCase("Resourses\\TC3_LoginTestData.json", "3")]
+        public void TC3_OpenMainPageAddToCartThreeBagsCheckCardIcon_CartIconHasRightNumber(string loginDatafilePath, string expectedCount)
         {
             var customerLoginPage = _homePage.ClickSignInButton();
-            LoginTestData loginTestData = LoginTestDataReader.ReadLoginTestData();
+            LoginTestData loginTestData = LoginTestDataReader.ReadLoginTestData(loginDatafilePath);
             customerLoginPage.Login(loginTestData);
             var gearPage = _homePage.OpenGearCategoryPage();
             var productListPage = gearPage.ClickBagsCategoryButton();
@@ -82,13 +79,17 @@ namespace Task15.Tests
             productListPage.AddProductToCartByNumber(1);
             var productPage = productListPage.OpenProductByNumber(2);
             productPage.ClickAddToCartButton();
-            Assert.AreEqual(expectedCount, productPage.GetCounterValue());
+            var actualCount = productPage.GetCounterValue();
+            var shoppingCart = _homePage.ClickViewEditCartButton();
+            shoppingCart.DeleteAllProduct();
+
+            Assert.AreEqual(expectedCount, actualCount);
         }
 
         [TearDown]
         public void TearDown()
         {
-            _driver.Quit();
+            DriverSingleton.QuitDriver();
         }
 
     }
