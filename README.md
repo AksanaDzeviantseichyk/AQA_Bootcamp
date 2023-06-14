@@ -8,3 +8,4 @@ This repo has the following branches with task solutions for AQA TI Bootcamp:
 6. Task9 contains tests using NUnit Library to test the functionality of the backend part of application.
 7. Task10 contains an implementation of the feature of deleting users added to the database during testing using the Observer pattern for Task 9. 
 8. Task15 cantains an implementation of UI tests using Selenium
+9. Task16 - Regular Expression
