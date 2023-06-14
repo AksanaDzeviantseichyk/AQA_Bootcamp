@@ -4,7 +4,7 @@ namespace RegularExpression
 {
     public static class RegularExpressionStore
     {
-        private static readonly Regex _emailRegex = new Regex(@"\s*(?i)[a-z]+.(?i)[a-z]+@(?i)[a-z]+.co(m|m\s)$");
+        private static readonly Regex _emailRegex = new Regex(@"(?i)\s*[a-z]+.[a-z]+@[a-z]+.com\s*$");
         private static readonly Regex _jsonNameRegex = new Regex(@"(?<="")\w+(?="":)");
         private static readonly Regex _jsonValueRegex = new Regex(@"(?<=:""?)\w+(?=""?)");
         private static readonly Regex _xmlNameRegex = new Regex(@"(?<=<)\w+(?=( \w+:\w+=""\w+"" /)?>)");
