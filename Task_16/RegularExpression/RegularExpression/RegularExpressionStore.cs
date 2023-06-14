@@ -53,7 +53,10 @@ namespace RegularExpression
         // numbers can be separated by symbols , | ; /
         public static IEnumerable<string> Method6(string input)
         {
-            return _phoneRegex.Matches(input).Select(match => match.Value.StartsWith("38") ? "+38" + match.Value.Substring(2) : match.Value).ToArray();
+            return _phoneRegex.Matches(input)
+                .Select(match => match.Value
+                    .StartsWith("38") ? "+38" + match.Value.Substring(2) : match.Value)
+                .ToArray();
         }
     }
 }

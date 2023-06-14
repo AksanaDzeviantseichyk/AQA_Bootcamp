@@ -9,7 +9,7 @@ namespace RegularExpression.Task
         private static readonly Regex _monthWordRegex = new Regex(@"(?<= )[а-яі]+$");
         private static readonly Regex _dayRegex = new Regex(@"(?<= )\d\d?(?= [а-яі]+)");
 
-        private static readonly Regex _dayLastRegex = new Regex(@"(?<= )\d\d?(?=\s[д](ень|ні))");
+        private static readonly Regex _dayLastRegex = new Regex(@"(?<= )\d\d?(?=\s(день|днів?))");
 
         private Dictionary<string, Func<string, DateTime>> _convertingFunctionByDateTimePattern = new Dictionary<string, Func<string, DateTime>>
         {
@@ -28,7 +28,7 @@ namespace RegularExpression.Task
                     int.Parse(_hourRegex.Match(input).Value),
                     int.Parse(_minuteRegex.Match(input).Value),
                     0),
-            [@"\d{2}:\d{2}, \d{1,2} (дні|день|днів) тому$"] = (string input) =>
+            [@"\d{2}:\d{2}, \d{1,2} (днів?|день) тому$"] = (string input) =>
               new DateTime(DateTime.Today.AddDays(-1 * int.Parse(_dayLastRegex.Match(input).Value)).Year,
                   DateTime.Today.AddDays(-1 * int.Parse(_dayLastRegex.Match(input).Value)).Month,
                   DateTime.Today.AddDays(-1 * int.Parse(_dayLastRegex.Match(input).Value)).Day,
