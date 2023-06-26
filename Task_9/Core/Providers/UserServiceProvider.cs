@@ -32,6 +32,29 @@ namespace Task_9.Core.Providers
         {
             return await _userServiceClient.RegisterNewUser(request);
         }
+        public async Task<CommonResponse<int>> RegisterValidUser(string condition)
+        {
+            switch (condition.Trim())
+            {
+                case "emptyFields":
+                    return await RegisterValidUser(_userGenerator.GenerateEmptyUserFieldsRequest());
+                case "nullFields":
+                    return await RegisterValidUser(_userGenerator.GenerateNullUserFieldsRequest());
+                case "length1SymbolFields":
+                    return await RegisterValidUser(_userGenerator.GenerateUserFieldsWithLength1SymbolRequest());
+                case "length100MoreSymbolsFields":
+                    return await RegisterValidUser(_userGenerator.GenerateUserFieldsWithLength100MoreSymbolRequest());
+                case "upperCaseFields":
+                    return await RegisterValidUser(_userGenerator.GenerateUpperCaseUserFieldsRequest());
+                case "digitFields":
+                    return await RegisterValidUser(_userGenerator.GenerateUserFieldsWithDigitsRequest());
+                case "specialCharactersFields":
+                    return await RegisterValidUser(_userGenerator.GenerateUserFieldsWithSpecialCharactersRequest());
+                 
+                default: return null;
+            }
+            
+        }
         public async Task<int> GetNotExistUserId()
         {
             var request = await RegisterValidUser();
@@ -72,6 +95,10 @@ namespace Task_9.Core.Providers
         public async Task<CommonResponse<object>> SetFalseStatusNotExistUser(int notExistUserId)
         {
             return await _userServiceClient.SetUserStatus(notExistUserId, false);
+        }
+        public async Task<CommonResponse<object>> SetUserStatus(int UserId, bool status)
+        {
+            return await _userServiceClient.SetUserStatus(UserId, status);
         }
         public async Task<CommonResponse<bool>> GetStatusExistUser(int userId)
         {

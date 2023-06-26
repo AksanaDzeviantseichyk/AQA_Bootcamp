@@ -7,6 +7,7 @@ namespace Task_9.Core.Contracts
     {
         Task<CommonResponse<int>> RegisterValidUser();
         Task<CommonResponse<int>> RegisterValidUser(RegisterNewUserRequest request);
+        Task<CommonResponse<int>> RegisterValidUser(string condition);
         Task<int> GetNotExistUserId();
         Task<int> GetActiveUserId();
         Task<int> GetNotActiveUserId();
@@ -16,6 +17,7 @@ namespace Task_9.Core.Contracts
         Task<CommonResponse<object>> SetFalseStatusExistUser(int userId);
         Task<CommonResponse<object>> SetTrueStatusNotExistUser(int notExistUserId);
         Task<CommonResponse<object>> SetFalseStatusNotExistUser(int notExistUserId);
+        Task<CommonResponse<object>> SetUserStatus(int UserId, bool status);
         Task<CommonResponse<bool>> GetStatusExistUser(int userId);
         Task<CommonResponse<bool>> GetStatusNotExistUser(int notExistUserId);
     }
