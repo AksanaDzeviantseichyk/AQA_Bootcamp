@@ -10,8 +10,8 @@ namespace Task_9.Specflow
         public CommonResponse<Guid> BalanceChargeResponse;
         public CommonResponse<Guid> RevertTransactionResponse;
         public CommonResponse<List<GetTransactionInfoResponse>> GetTransactionResponse;
-        public ConcurrentDictionary<decimal, Guid> BalanceChargeDictionary = new ConcurrentDictionary<decimal, Guid>();
-        public ConcurrentDictionary<decimal, Guid> RevertTransactionDictionary = new ConcurrentDictionary<decimal, Guid>();
+        public ConcurrentDictionary<Guid, decimal> BalanceChargeDictionary = new ConcurrentDictionary<Guid, decimal>();
+        public ConcurrentDictionary<Guid, decimal> RevertTransactionDictionary = new ConcurrentDictionary<Guid, decimal>();
         public Guid TransactionId;
     }
 }

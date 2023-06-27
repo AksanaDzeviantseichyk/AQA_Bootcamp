@@ -1,4 +1,5 @@
-﻿using Task_9.Tests;
+﻿using System.Collections.Concurrent;
+using Task_9.Tests;
 using TechTalk.SpecFlow;
 
 namespace Task_9.Specflow.Steps
@@ -28,7 +29,7 @@ namespace Task_9.Specflow.Steps
             foreach (var charge in charges)
             {
                 _walletContext.BalanceChargeResponse = await _walletProvider.BalanceCharge(_userContext.UserId, charge);
-                _walletContext.BalanceChargeDictionary.TryAdd(charge, _walletContext.BalanceChargeResponse.Body);
+                _walletContext.BalanceChargeDictionary.TryAdd(_walletContext.BalanceChargeResponse.Body, charge);
             }
         }
         [When(@"balance charge")]
@@ -40,29 +41,42 @@ namespace Task_9.Specflow.Steps
         [Given(@"get charge transaction id with (.*) amount")]
         public void GivenGetChargeTransactionIdWithAmount(decimal amount)
         {
-           _walletContext.BalanceChargeDictionary.TryGetValue(amount, out _walletContext.TransactionId);
+            _walletContext.TransactionId = _walletContext.BalanceChargeDictionary
+                .FirstOrDefault(x => x.Value == amount).Key;
         }
 
         [Given(@"revert transaction with (.*)")]
         [When(@"revert transaction with (.*)")]
         public async Task GivenRevertTransactionWith(decimal revertAmount)
         {
-            _walletContext.BalanceChargeDictionary
-                .TryGetValue(revertAmount, out _walletContext.TransactionId);
-            _walletContext.RevertTransactionResponse = await _walletProvider
-                .RevertExistTransaction(_walletContext.TransactionId);
-            _walletContext.RevertTransactionDictionary.TryAdd(revertAmount, _walletContext.RevertTransactionResponse.Body);
+            await RevertTransaction(revertAmount, _walletContext.BalanceChargeDictionary);
         }
 
+        [When(@"revert some transaction with (.*)")]
+        public async Task GivenRevertTransactionWith(string revertAmount)
+        {
+            var revertCharges = revertAmount.Split(",").Select(decimal.Parse).ToArray(); ;
+            foreach (var revertCharge in revertCharges)
+            {
+                await RevertTransaction(revertCharge, _walletContext.BalanceChargeDictionary);
+            }
+        }
         [Given(@"revert of revert transaction with (.*)")]
         [When(@"revert of revert transaction with (.*)")]
         public async Task GivenRevertOfRevertTransactionWith(decimal revertAmount)
         {
-            _walletContext.RevertTransactionDictionary
-                .TryGetValue(revertAmount, out _walletContext.TransactionId);
+            await RevertTransaction(revertAmount, _walletContext.RevertTransactionDictionary);
+        }
+
+        private async Task RevertTransaction(decimal revertAmount, ConcurrentDictionary<Guid,decimal> input)
+        {
+            _walletContext.TransactionId = input.FirstOrDefault(x => x.Value == revertAmount).Key;
             _walletContext.RevertTransactionResponse = await _walletProvider
                 .RevertExistTransaction(_walletContext.TransactionId);
-            _walletContext.RevertTransactionDictionary.TryAdd(revertAmount, _walletContext.RevertTransactionResponse.Body);
+            _walletContext.BalanceChargeDictionary
+                .TryRemove(new KeyValuePair<Guid, decimal>(_walletContext.TransactionId, revertAmount));
+            _walletContext.RevertTransactionDictionary
+                .TryAdd(_walletContext.RevertTransactionResponse.Body, revertAmount);
         }
 
         [When(@"revert wrong transaction")]

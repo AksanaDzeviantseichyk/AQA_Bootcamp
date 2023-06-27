@@ -78,7 +78,7 @@ namespace Task_9.Specflow.Steps
         [Then(@"check all get transaction response fields")]
         public void ThenCheckAllGetTransactionResponseFields()
         {
-            var expectedAmount = _walletContext.BalanceChargeDictionary.FirstOrDefault(x => x.Value == _walletContext.TransactionId).Key;
+            _walletContext.BalanceChargeDictionary.TryGetValue(_walletContext.TransactionId, out var expectedAmount);
             DateTimeZone desiredTimeZone = DateTimeZoneProviders.Tzdb["Etc/GMT"];
             ZonedDateTime currentZonedDateTime = SystemClock.Instance.GetCurrentInstant().InZone(desiredTimeZone);
             LocalDate expectedDate = currentZonedDateTime.Date;

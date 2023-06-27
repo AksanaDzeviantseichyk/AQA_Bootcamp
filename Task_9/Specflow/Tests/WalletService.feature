@@ -135,8 +135,8 @@ Examples:
 | 10000000  | 0               |
 | 999999.99 | 0               |
 
-#TC35
-Scenario: T35_Balance is N and revert transaction with some amount
+#TC35,40
+Scenario: T35_40_Balance is N and revert transaction with some amount
 	Given get active user id
 	And balance charge <Amount>
 	And revert transaction with <revertAmount>
@@ -167,6 +167,19 @@ Scenario: T38_Revert of revert
 	And get user balance
 	Then revert transaction response Status is 'Ok'
 	And user balance should be 20
+
+#TC41,42
+Scenario: T41_42_CreateFewTransactionAndRevertSomeOfThem
+	Given get active user id
+	And balance charge <Amount>
+	When revert some transaction with <revertAmount>
+	And get user balance
+	Then revert transaction response Status is 'Ok'
+	And user balance should be <expectedBalance>
+Examples: 
+| Amount              | revertAmount        | expectedBalance |
+| 1,1,1               | 1,1                 | 1               |
+| 100,100,100,200,300 | 100,100,100,200,300 | 0               |
 
 #TC43
 Scenario: T43_Charge balance for not active user
