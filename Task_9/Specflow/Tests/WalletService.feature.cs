@@ -232,10 +232,14 @@ this.ScenarioInitialize(scenarioInfo);
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("T16_Get user balance after revert")]
-        public void T16_GetUserBalanceAfterRevert()
+        [NUnit.Framework.TestCaseAttribute("100,-0.01, 100", "-0.01", "200", null)]
+        public void T16_GetUserBalanceAfterRevert(string amount, string revertAmount, string expectedBalance, string[] exampleTags)
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Amount", amount);
+            argumentsOfScenario.Add("revertAmount", revertAmount);
+            argumentsOfScenario.Add("ExpectedBalance", expectedBalance);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T16_Get user balance after revert", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 52
 this.ScenarioInitialize(scenarioInfo);
@@ -251,22 +255,19 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 54
- testRunner.And("balance charge 100", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And(string.Format("balance charge {0}", amount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 55
- testRunner.And("get charge transaction id with -0.01 amount", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And(string.Format("revert transaction with {0}", revertAmount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 56
- testRunner.And("revert exist transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 57
  testRunner.When("get user balance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 58
+#line 57
  testRunner.Then("get user balance response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 59
- testRunner.And("user balance should be 100", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 58
+ testRunner.And(string.Format("user balance should be {0}", expectedBalance), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -279,7 +280,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T17_Get transaction for active user without any transactions", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 62
+#line 64
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -289,16 +290,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 63
+#line 65
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 64
+#line 66
  testRunner.When("get transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 65
+#line 67
  testRunner.Then("get transaction response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 66
+#line 68
  testRunner.And("count of transactions should be 0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -316,7 +317,7 @@ this.ScenarioInitialize(scenarioInfo);
             argumentsOfScenario.Add("Amount", amount);
             argumentsOfScenario.Add("expectedCount", expectedCount);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T18_19_Get transaction for user with one ore some transactions", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 69
+#line 71
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -326,19 +327,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 70
+#line 72
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 71
+#line 73
  testRunner.And(string.Format("balance charge {0}", amount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 72
+#line 74
  testRunner.When("get transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 73
+#line 75
  testRunner.Then("get transaction response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 74
+#line 76
  testRunner.And(string.Format("count of transactions should be {0}", expectedCount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -352,7 +353,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T21_Get transaction and check all fields", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 81
+#line 83
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -362,16 +363,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 82
+#line 84
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 83
+#line 85
+ testRunner.And("balance charge 100", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 86
  testRunner.And("get charge transaction id with 100 amount", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 84
+#line 87
  testRunner.When("get transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 85
+#line 88
  testRunner.Then("check all get transaction response fields", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -380,12 +384,14 @@ this.ScenarioInitialize(scenarioInfo);
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("T22_Make revert and get transaction - count is transaction is two")]
-        public void T22_MakeRevertAndGetTransaction_CountIsTransactionIsTwo()
+        [NUnit.Framework.TestCaseAttribute("100", null)]
+        public void T22_MakeRevertAndGetTransaction_CountIsTransactionIsTwo(string amount, string[] exampleTags)
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Amount", amount);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T22_Make revert and get transaction - count is transaction is two", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 88
+#line 91
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -395,19 +401,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 89
+#line 92
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 90
- testRunner.And("get charge transaction id with 100 amount", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 93
+ testRunner.And(string.Format("balance charge {0}", amount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 91
- testRunner.When("revert exist transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 94
+ testRunner.When(string.Format("revert transaction with {0}", amount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 92
+#line 95
  testRunner.And("get transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 93
+#line 96
  testRunner.Then("check get transaction response fields after revert", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -421,7 +427,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T30_Get transaction for not active user", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 96
+#line 102
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -431,16 +437,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 97
+#line 103
  testRunner.Given("get not active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 98
+#line 104
  testRunner.When("get transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 99
+#line 105
  testRunner.Then("get transaction response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 100
+#line 106
  testRunner.And("count of transactions should be 0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -454,7 +460,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T31_Get transaction for not exsist user", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 103
+#line 109
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -464,16 +470,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 104
+#line 110
  testRunner.Given("get not exist user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 105
+#line 111
  testRunner.When("get transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 106
+#line 112
  testRunner.Then("get transaction response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 107
+#line 113
  testRunner.And("count of transactions should be 0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -489,7 +495,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("ExpectedMessage", expectedMessage);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T33_Revert transaction with wrong id", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 110
+#line 116
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -499,13 +505,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 111
+#line 117
  testRunner.When("revert wrong transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 112
+#line 118
  testRunner.Then("revert transaction response Status is \'NotFound\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 113
+#line 119
  testRunner.And(string.Format("revert transaction response Content is: {0}", expectedMessage), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -514,16 +520,17 @@ this.ScenarioInitialize(scenarioInfo);
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("T34_36_39_Revert transaction with some amount")]
-        [NUnit.Framework.TestCaseAttribute("0.01", null)]
-        [NUnit.Framework.TestCaseAttribute("10000000", null)]
-        [NUnit.Framework.TestCaseAttribute("999999.99", null)]
-        public void T34_36_39_RevertTransactionWithSomeAmount(string amount, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("0.01", "0", null)]
+        [NUnit.Framework.TestCaseAttribute("10000000", "0", null)]
+        [NUnit.Framework.TestCaseAttribute("999999.99", "0", null)]
+        public void T34_36_39_RevertTransactionWithSomeAmount(string amount, string expectedBalance, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("Amount", amount);
+            argumentsOfScenario.Add("expectedBalance", expectedBalance);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T34_36_39_Revert transaction with some amount", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 119
+#line 125
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -533,23 +540,23 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 120
+#line 126
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 121
- testRunner.And(string.Format("get charge transaction id with {0} amount", amount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 127
+ testRunner.And(string.Format("balance charge {0}", amount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 122
- testRunner.When("revert exist transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 128
+ testRunner.When(string.Format("revert transaction with {0}", amount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 123
+#line 129
  testRunner.And("get user balance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 124
+#line 130
  testRunner.Then("revert transaction response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 125
- testRunner.And("user balance should be 0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 131
+ testRunner.And(string.Format("user balance should be {0}", expectedBalance), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -557,12 +564,16 @@ this.ScenarioInitialize(scenarioInfo);
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("T35_Balance is N and revert transaction with some amount")]
-        public void T35_BalanceIsNAndRevertTransactionWithSomeAmount()
+        [NUnit.Framework.TestCaseAttribute("100,-0.01, 100", "-0.01", "200", null)]
+        public void T35_BalanceIsNAndRevertTransactionWithSomeAmount(string amount, string revertAmount, string expectedBalance, string[] exampleTags)
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Amount", amount);
+            argumentsOfScenario.Add("revertAmount", revertAmount);
+            argumentsOfScenario.Add("ExpectedBalance", expectedBalance);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T35_Balance is N and revert transaction with some amount", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 133
+#line 139
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -572,26 +583,23 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 134
+#line 140
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 135
- testRunner.And("balance charge 100", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 141
+ testRunner.And(string.Format("balance charge {0}", amount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 136
- testRunner.And("get charge transaction id with -0.01 amount", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 142
+ testRunner.And(string.Format("revert transaction with {0}", revertAmount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 137
- testRunner.And("revert exist transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 138
+#line 143
  testRunner.When("get user balance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 139
+#line 144
  testRunner.Then("revert transaction response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 140
- testRunner.And("user balance should be 100", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 145
+ testRunner.And(string.Format("user balance should be {0}", expectedBalance), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -604,7 +612,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T37_Revert transaction with 10kk more amount", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 143
+#line 151
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -614,31 +622,28 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 144
+#line 152
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 145
- testRunner.And("get charge transaction id with 20 amount", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 153
+ testRunner.And("balance charge 20, -10", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 146
- testRunner.And("balance charge -10", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 154
+ testRunner.And("revert transaction with 20", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 147
- testRunner.And("revert exist transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 155
+ testRunner.And("balance charge 10000000.01", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 148
- testRunner.And("get charge transaction id with 10000000.01 amount", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 156
+ testRunner.When("revert transaction with 10000000.01", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 149
- testRunner.When("revert exist transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 150
+#line 157
  testRunner.And("get user balance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 151
+#line 158
  testRunner.Then("revert transaction response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 152
+#line 159
  testRunner.And("user balance should be -10", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -652,7 +657,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T38_Revert of revert", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 155
+#line 162
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -662,25 +667,25 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 156
+#line 163
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 157
- testRunner.And("get charge transaction id with 20 amount", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 164
+ testRunner.And("balance charge 20", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 158
- testRunner.When("revert exist transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 165
+ testRunner.When("revert transaction with 20", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 159
- testRunner.And("revert exist transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 166
+ testRunner.And("revert of revert transaction with 20", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 160
+#line 167
  testRunner.And("get user balance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 161
+#line 168
  testRunner.Then("revert transaction response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 162
+#line 169
  testRunner.And("user balance should be 20", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -694,39 +699,6 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T43_Charge balance for not active user", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 165
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 166
- testRunner.Given("get not active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 167
- testRunner.When("balance charge", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 168
- testRunner.Then("charge balance response Status is \'InternalServerError\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 169
- testRunner.And("charge balance response Content is: not active user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T44_Charge balance for not exist user")]
-        public void T44_ChargeBalanceForNotExistUser()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T44_Charge balance for not exist user", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 172
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -738,7 +710,7 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 173
- testRunner.Given("get not exist user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("get not active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 174
  testRunner.When("balance charge", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
@@ -754,12 +726,12 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T46_Charge 0 amount")]
-        public void T46_Charge0Amount()
+        [NUnit.Framework.DescriptionAttribute("T44_Charge balance for not exist user")]
+        public void T44_ChargeBalanceForNotExistUser()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T46_Charge 0 amount", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T44_Charge balance for not exist user", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 179
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -771,15 +743,48 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 180
- testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("get not exist user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 181
- testRunner.When("balance charge 0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("balance charge", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 182
  testRunner.Then("charge balance response Status is \'InternalServerError\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 183
+ testRunner.And("charge balance response Content is: not active user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("T46_Charge 0 amount")]
+        public void T46_Charge0Amount()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T46_Charge 0 amount", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 186
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 187
+ testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 188
+ testRunner.When("balance charge 0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 189
+ testRunner.Then("charge balance response Status is \'InternalServerError\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 190
  testRunner.And("charge balance response Content is: Amount cannot be \'0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -796,7 +801,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("ExpectedMessage", expectedMessage);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T47_Balance 0 charge amount more than max sum", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 186
+#line 193
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -806,16 +811,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 187
+#line 194
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 188
+#line 195
  testRunner.When("balance charge 10000000.01", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 189
+#line 196
  testRunner.Then("charge balance response Status is \'InternalServerError\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 190
+#line 197
  testRunner.And(string.Format("charge balance response Content is: {0}", expectedMessage), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -831,7 +836,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("ExpectedMessage", expectedMessage);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T48_Charge amount with precision two", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 196
+#line 203
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -841,16 +846,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 197
+#line 204
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 198
+#line 205
  testRunner.When("balance charge 0.001", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 199
+#line 206
  testRunner.Then("charge balance response Status is \'InternalServerError\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 200
+#line 207
  testRunner.And(string.Format("charge balance response Content is: {0}", expectedMessage), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -864,7 +869,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T49_One transaction with some positive amount", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 206
+#line 213
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -874,19 +879,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 207
+#line 214
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 208
+#line 215
  testRunner.When("balance charge 0.01", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 209
+#line 216
  testRunner.And("get user balance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 210
+#line 217
  testRunner.Then("charge balance response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 211
+#line 218
  testRunner.And("user balance should be 0.01", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -907,7 +912,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("Amount", amount);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T45_50_53_56_Balance N and charge some amount - result balance is positive", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 214
+#line 221
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -917,19 +922,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 215
+#line 222
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 216
+#line 223
  testRunner.When(string.Format("balance charge {0}", amount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 217
+#line 224
  testRunner.And("get user balance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 218
+#line 225
  testRunner.Then("charge balance response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 219
+#line 226
  testRunner.And("user balance is more than 0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -943,7 +948,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T51_Balance is some negative amount and charge amount to get max sum", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 234
+#line 241
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -953,28 +958,25 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 235
+#line 242
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 236
- testRunner.And("get charge transaction id with 2000 amount", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 243
+ testRunner.And("balance charge 2000,-1000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 237
- testRunner.And("balance charge -1000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 244
+ testRunner.And("revert transaction with 2000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 238
- testRunner.And("revert exist transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 239
+#line 245
  testRunner.When("balance charge 10001000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 240
+#line 246
  testRunner.And("get user balance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 241
+#line 247
  testRunner.Then("charge balance response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 242
+#line 248
  testRunner.And("user balance should be 10000000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -991,7 +993,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("ExpectedMessage", expectedMessage);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T52_Balance is some negative amount and charge amount to get more than max sum", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 245
+#line 251
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1001,25 +1003,22 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 246
+#line 252
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 247
- testRunner.And("get charge transaction id with 2000 amount", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 253
+ testRunner.And("balance charge 2000,-1000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 248
- testRunner.And("balance charge -1000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 254
+ testRunner.And("revert transaction with 2000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 249
- testRunner.And("revert exist transaction", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 250
+#line 255
  testRunner.When("balance charge 10001000.01", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 251
+#line 256
  testRunner.Then("charge balance response Status is \'InternalServerError\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 252
+#line 257
  testRunner.And(string.Format("charge balance response Content is: {0}", expectedMessage), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -1037,7 +1036,7 @@ this.ScenarioInitialize(scenarioInfo);
             argumentsOfScenario.Add("Amount", amount);
             argumentsOfScenario.Add("ExpectedMessage", expectedMessage);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T54_55_Charge balance with overall negative result", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 258
+#line 263
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1047,16 +1046,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 259
+#line 264
  testRunner.Given("get active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 260
+#line 265
  testRunner.When(string.Format("balance charge {0}", amount), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 261
+#line 266
  testRunner.Then("charge balance response Status is \'InternalServerError\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 262
+#line 267
  testRunner.And(string.Format("charge balance response Content is: {0}", expectedMessage), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

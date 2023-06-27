@@ -78,6 +78,7 @@ namespace Task_9.Specflow.Steps
         [Then(@"check all get transaction response fields")]
         public void ThenCheckAllGetTransactionResponseFields()
         {
+            var expectedAmount = _walletContext.BalanceChargeDictionary.FirstOrDefault(x => x.Value == _walletContext.TransactionId).Key;
             DateTimeZone desiredTimeZone = DateTimeZoneProviders.Tzdb["Etc/GMT"];
             ZonedDateTime currentZonedDateTime = SystemClock.Instance.GetCurrentInstant().InZone(desiredTimeZone);
             LocalDate expectedDate = currentZonedDateTime.Date;
@@ -85,7 +86,7 @@ namespace Task_9.Specflow.Steps
             Assert.Multiple(() =>
             {
                 Assert.AreEqual(_userContext.UserId, _walletContext.GetTransactionResponse.Body[0].UserId);
-                Assert.AreEqual(100, _walletContext.GetTransactionResponse.Body[0].Amount);
+                Assert.AreEqual(expectedAmount, _walletContext.GetTransactionResponse.Body[0].Amount);
                 Assert.AreEqual(_walletContext.TransactionId, _walletContext.GetTransactionResponse.Body[0].TransactionId);
                 Assert.AreEqual(expectedDate, actualDate);
                 Assert.AreEqual(TransactionStatus.NotReverted, _walletContext.GetTransactionResponse.Body[0].Status);
