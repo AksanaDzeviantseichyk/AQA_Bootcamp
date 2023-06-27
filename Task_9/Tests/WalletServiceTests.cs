@@ -129,7 +129,7 @@ namespace Task_9.Tests
             var notExistUserId = await _userProvider.GetNotExistUserId();
             
             //Action
-            var responseBalanceCharge = await _walletProvider.GetBalance(notExistUserId);
+            var responseBalanceCharge = await _walletProvider.BalanceCharge(notExistUserId);
             //Assert
             Assert.Multiple(() =>
             {

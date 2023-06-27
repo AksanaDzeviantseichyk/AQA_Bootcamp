@@ -74,7 +74,7 @@ namespace Task_9.Specflow.Tests
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T1-7 New valid user should be register")]
+        [NUnit.Framework.DescriptionAttribute("T1to7_ New valid user should be register")]
         [NUnit.Framework.TestCaseAttribute("emptyFields", null)]
         [NUnit.Framework.TestCaseAttribute("nullFields", null)]
         [NUnit.Framework.TestCaseAttribute("length1SymbolFields", null)]
@@ -82,12 +82,12 @@ namespace Task_9.Specflow.Tests
         [NUnit.Framework.TestCaseAttribute("upperCaseFields", null)]
         [NUnit.Framework.TestCaseAttribute("digitFields", null)]
         [NUnit.Framework.TestCaseAttribute("specialCharactersFields", null)]
-        public void T1_7NewValidUserShouldBeRegister(string condition, string[] exampleTags)
+        public void T1To7_NewValidUserShouldBeRegister(string condition, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("condition", condition);
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T1-7 New valid user should be register", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T1to7_ New valid user should be register", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 6
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -109,12 +109,12 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T8 New registred valid users should be return autoincremented user ID")]
-        public void T8NewRegistredValidUsersShouldBeReturnAutoincrementedUserID()
+        [NUnit.Framework.DescriptionAttribute("T8_ New registred valid users should be return autoincremented user ID")]
+        public void T8_NewRegistredValidUsersShouldBeReturnAutoincrementedUserID()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T8 New registred valid users should be return autoincremented user ID", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T8_ New registred valid users should be return autoincremented user ID", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 21
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -136,12 +136,12 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T9 Register new user after deleting of last user - new user id is incremented")]
-        public void T9RegisterNewUserAfterDeletingOfLastUser_NewUserIdIsIncremented()
+        [NUnit.Framework.DescriptionAttribute("T9_ Register new user after deleting of last user - new user id is incremented")]
+        public void T9_RegisterNewUserAfterDeletingOfLastUser_NewUserIdIsIncremented()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T9 Register new user after deleting of last user - new user id is incremented", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T9_ Register new user after deleting of last user - new user id is incremented", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 26
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -175,12 +175,12 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T10 Get not exist user status  - status code is not found")]
-        public void T10GetNotExistUserStatus_StatusCodeIsNotFound()
+        [NUnit.Framework.DescriptionAttribute("T10_ Get not exist user status  - status code is not found")]
+        public void T10_GetNotExistUserStatus_StatusCodeIsNotFound()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T10 Get not exist user status  - status code is not found", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T10_ Get not exist user status  - status code is not found", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 35
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -209,12 +209,12 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T11 Default user status should be false")]
-        public void T11DefaultUserStatusShouldBeFalse()
+        [NUnit.Framework.DescriptionAttribute("T11_ Default user status should be false")]
+        public void T11_DefaultUserStatusShouldBeFalse()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T11 Default user status should be false", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T11_ Default user status should be false", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 42
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -239,14 +239,14 @@ testRunner.Then("user isActive status should be \'false\'", ((string)(null)), ((
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T12 Check changed true user status")]
+        [NUnit.Framework.DescriptionAttribute("T12_ Check changed true user status")]
         [NUnit.Framework.TestCaseAttribute("true", null)]
-        public void T12CheckChangedTrueUserStatus(string isActive, string[] exampleTags)
+        public void T12_CheckChangedTrueUserStatus(string isActive, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("isActive", isActive);
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T12 Check changed true user status", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T12_ Check changed true user status", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 48
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -277,14 +277,14 @@ testRunner.And("user isActive status should be \'true\'", ((string)(null)), ((Te
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T13 Check changed false user status")]
+        [NUnit.Framework.DescriptionAttribute("T13_ Check changed false user status")]
         [NUnit.Framework.TestCaseAttribute("true - false", null)]
-        public void T13CheckChangedFalseUserStatus(string isActive, string[] exampleTags)
+        public void T13_CheckChangedFalseUserStatus(string isActive, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("isActive", isActive);
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T13 Check changed false user status", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T13_ Check changed false user status", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 59
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -315,14 +315,14 @@ testRunner.And("user isActive status should be \'false\'", ((string)(null)), ((T
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T14 Set user status for not exist user")]
+        [NUnit.Framework.DescriptionAttribute("T14_ Set user status for not exist user")]
         [NUnit.Framework.TestCaseAttribute("true", null)]
-        public void T14SetUserStatusForNotExistUser(string isActive, string[] exampleTags)
+        public void T14_SetUserStatusForNotExistUser(string isActive, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("isActive", isActive);
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T14 Set user status for not exist user", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T14_ Set user status for not exist user", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 70
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -351,16 +351,16 @@ testRunner.And("set user status response Content is \'Specified argument was out
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T15-17-19 Set user status - user status is true")]
+        [NUnit.Framework.DescriptionAttribute("T15_17_19_ Set user status - user status is true")]
         [NUnit.Framework.TestCaseAttribute("true", null)]
         [NUnit.Framework.TestCaseAttribute("true - false - true", null)]
         [NUnit.Framework.TestCaseAttribute("true - true", null)]
-        public void T15_17_19SetUserStatus_UserStatusIsTrue(string isActive, string[] exampleTags)
+        public void T15_17_19_SetUserStatus_UserStatusIsTrue(string isActive, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("isActive", isActive);
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T15-17-19 Set user status - user status is true", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T15_17_19_ Set user status - user status is true", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 80
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -378,9 +378,12 @@ testRunner.Given("get not active user id", ((string)(null)), ((TechTalk.SpecFlow
 testRunner.When(string.Format("set {0} user status", isActive), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 83
-testRunner.Then("set user status response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+testRunner.And("get user status", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 84
+testRunner.Then("set user status response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 85
 testRunner.And("user isActive status should be \'true\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -388,16 +391,16 @@ testRunner.And("user isActive status should be \'true\'", ((string)(null)), ((Te
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T16-18 Set user status - user status is false")]
+        [NUnit.Framework.DescriptionAttribute("T16_18_ Set user status - user status is false")]
         [NUnit.Framework.TestCaseAttribute("true - false", null)]
         [NUnit.Framework.TestCaseAttribute("false", null)]
-        public void T16_18SetUserStatus_UserStatusIsFalse(string isActive, string[] exampleTags)
+        public void T16_18_SetUserStatus_UserStatusIsFalse(string isActive, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("isActive", isActive);
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T16-18 Set user status - user status is false", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 92
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T16_18_ Set user status - user status is false", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 93
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -407,16 +410,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 93
+#line 94
 testRunner.Given("get not active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 94
+#line 95
 testRunner.When(string.Format("set {0} user status", isActive), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 95
+#line 96
+testRunner.And("get user status", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 97
 testRunner.Then("set user status response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 96
+#line 98
 testRunner.And("user isActive status should be \'false\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -424,13 +430,13 @@ testRunner.And("user isActive status should be \'false\'", ((string)(null)), ((T
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T20 Delete not active user")]
-        public void T20DeleteNotActiveUser()
+        [NUnit.Framework.DescriptionAttribute("T20_ Delete not active user")]
+        public void T20_DeleteNotActiveUser()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T20 Delete not active user", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 103
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T20_ Delete not active user", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 105
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -440,13 +446,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 104
+#line 106
 testRunner.Given("get not active user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 105
+#line 107
 testRunner.When("delete user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 106
+#line 108
 testRunner.Then("delete user response Status is \'Ok\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -454,13 +460,13 @@ testRunner.Then("delete user response Status is \'Ok\'", ((string)(null)), ((Tec
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("T21 Delete not exsist user")]
-        public void T21DeleteNotExsistUser()
+        [NUnit.Framework.DescriptionAttribute("T21_ Delete not exsist user")]
+        public void T21_DeleteNotExsistUser()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T21 Delete not exsist user", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 109
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("T21_ Delete not exsist user", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 111
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -470,16 +476,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 110
+#line 112
 testRunner.Given("get not exist user id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 111
+#line 113
 testRunner.When("delete user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 112
+#line 114
 testRunner.Then("delete user response Status is \'InternalServerError\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 113
+#line 115
 testRunner.And("delete user response Content is \'Sequence contains no elements\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
