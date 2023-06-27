@@ -481,12 +481,12 @@ namespace Task_9.Tests
             //Precondition
             var notExistUserId = await _userProvider.GetNotExistUserId();
             //Action
-            var responseGetBalance = await _walletProvider.GetTransaction(notExistUserId);
+            var responseGetTransaction = await _walletProvider.GetTransaction(notExistUserId);
             //Assert
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(HttpStatusCode.OK, responseGetBalance.Status);
-                Assert.AreEqual(0, responseGetBalance.Body.Count());
+                Assert.AreEqual(HttpStatusCode.OK, responseGetTransaction.Status);
+                Assert.AreEqual(0, responseGetTransaction.Body.Count());
             });
         }
 

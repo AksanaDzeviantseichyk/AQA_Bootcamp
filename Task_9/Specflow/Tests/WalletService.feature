@@ -50,51 +50,154 @@ Examples:
 
 #TC16
 Scenario: T16_Get user balance after revert
-Given get active user id
-And balance charge 100
-And get charge transaction id with '-0.01' amount
-And revert exist transaction
-When get user balance
-Then get user balance response Status is 'Ok'
-And user balance should be 100
+	Given get active user id
+	And balance charge 100
+	And get charge transaction id with -0.01 amount
+	And revert exist transaction
+	When get user balance
+	Then get user balance response Status is 'Ok'
+	And user balance should be 100
+
+#TC17
+Scenario: T17_Get transaction for active user without any transactions
+	Given get active user id
+	When get transaction
+	Then get transaction response Status is 'Ok'
+	And count of transactions should be 0
+
+#TC18,19
+Scenario: T18_19_Get transaction for user with one ore some transactions
+	Given get active user id
+	And balance charge <Amount>
+	When get transaction
+	Then get transaction response Status is 'Ok'
+	And count of transactions should be <expectedCount>
+Examples: 
+| Amount | expectedCount |
+| 100    | 1             |
+| 100,2  | 2             |
+
+#TC21
+Scenario: T21_Get transaction and check all fields
+	Given get active user id
+	And get charge transaction id with 100 amount
+	When get transaction
+	Then check all get transaction response fields
+
+#TC22
+Scenario: T22_Make revert and get transaction - count is transaction is two
+	Given get active user id
+	And get charge transaction id with 100 amount
+	When revert exist transaction
+	And get transaction
+	Then check get transaction response fields after revert
+
+#TC30
+Scenario: T30_Get transaction for not active user
+	Given get not active user id
+	When get transaction
+	Then get transaction response Status is 'Ok'
+	And count of transactions should be 0
+
+#TC31
+Scenario: T31_Get transaction for not exsist user
+	Given get not exist user id
+	When get transaction
+	Then get transaction response Status is 'Ok'
+	And count of transactions should be 0
+
+#TC33
+Scenario: T33_Revert transaction with wrong id
+	When  revert wrong transaction
+	Then revert transaction response Status is 'NotFound'
+	And revert transaction response Content is: <ExpectedMessage>
+Examples: 
+| ExpectedMessage                                  |
+| The given key was not present in the dictionary. |
+
+#TC34,36,39
+Scenario: T34_36_39_Revert transaction with some amount
+	Given get active user id
+	And get charge transaction id with <Amount> amount
+	When revert exist transaction
+	And get user balance
+	Then revert transaction response Status is 'Ok'
+	And user balance should be 0
+Examples: 
+| Amount    |
+| 0.01      |
+| 10000000  |
+| 999999.99 |
+
+#TC35
+Scenario: T35_Balance is N and revert transaction with some amount
+	Given get active user id
+	And balance charge 100
+	And get charge transaction id with -0.01 amount
+	And revert exist transaction
+	When get user balance
+	Then revert transaction response Status is 'Ok'
+	And user balance should be 100
+
+#TC37
+Scenario: T37_Revert transaction with 10kk more amount
+	Given get active user id
+	And get charge transaction id with 20 amount
+	And balance charge -10
+	And revert exist transaction
+	And get charge transaction id with 10000000.01 amount
+	When revert exist transaction
+	And get user balance
+	Then revert transaction response Status is 'Ok'
+	And user balance should be -10
+
+#TC38
+Scenario: T38_Revert of revert
+	Given get active user id
+	And get charge transaction id with 20 amount
+	When revert exist transaction
+	And revert exist transaction
+	And get user balance
+	Then revert transaction response Status is 'Ok'
+	And user balance should be 20
 
 #TC43
 Scenario: T43_Charge balance for not active user
-Given get not active user id
-When balance charge 
-Then charge balance response Status is 'InternalServerError'
-And charge balance response Content is: not active user
+	Given get not active user id
+	When balance charge 
+	Then charge balance response Status is 'InternalServerError'
+	And charge balance response Content is: not active user
 
 #TC44
 Scenario: T44_Charge balance for not exist user
-Given get not exist user id
-When balance charge 
-Then charge balance response Status is 'InternalServerError'
-And charge balance response Content is: not active user
+	Given get not exist user id
+	When balance charge 
+	Then charge balance response Status is 'InternalServerError'
+	And charge balance response Content is: not active user
 
 #TC46
 Scenario: T46_Charge 0 amount
-Given get active user id
-When balance charge 0
-Then charge balance response Status is 'InternalServerError'
-And charge balance response Content is: Amount cannot be '0'
+	Given get active user id
+	When balance charge 0
+	Then charge balance response Status is 'InternalServerError'
+	And charge balance response Content is: Amount cannot be '0'
 
 #TC47
 Scenario: T47_Balance 0 charge amount more than max sum
-Given get active user id
-When balance charge 10000000.01
-Then charge balance response Status is 'InternalServerError'
-And charge balance response Content is: <ExpectedMessage>
+	Given get active user id
+	When balance charge 10000000.01
+	Then charge balance response Status is 'InternalServerError'
+	And charge balance response Content is: <ExpectedMessage>
 Examples: 
 | ExpectedMessage                                                                      |
 | After this charge balance could be '10000000.01', maximum user balance is '10000000' |
 
 #TC48
 Scenario: T48_Charge amount with precision two
-Given get active user id
-When balance charge 0.001
-Then charge balance response Status is 'InternalServerError'
-And charge balance response Content is: <ExpectedMessage>
+	Given get active user id
+	When balance charge 0.001
+	Then charge balance response Status is 'InternalServerError'
+	And charge balance response Content is: <ExpectedMessage>
 Examples: 
 | ExpectedMessage                                      |
 | Amount value must have precision 2 numbers after dot |
@@ -129,22 +232,22 @@ Examples:
 
 #TC51
 Scenario: T51_Balance is some negative amount and charge amount to get max sum
-Given get active user id
-And get charge transaction id with '2000' amount
-And balance charge -1000
-And revert exist transaction
-When balance charge 10001000
+	Given get active user id
+	And get charge transaction id with 2000 amount
+	And balance charge -1000
+	And revert exist transaction
+	When balance charge 10001000
 	And get user balance
 	Then charge balance response Status is 'Ok'
 	And user balance should be 10000000
 
 #TC52
 Scenario: T52_Balance is some negative amount and charge amount to get more than max sum
-Given get active user id
-And get charge transaction id with '2000' amount
-And balance charge -1000
-And revert exist transaction
-When balance charge 10001000.01
+	Given get active user id
+	And get charge transaction id with 2000 amount
+	And balance charge -1000
+	And revert exist transaction
+	When balance charge 10001000.01
 	Then charge balance response Status is 'InternalServerError'
 	And charge balance response Content is: <ExpectedMessage>
 	Examples: 
@@ -153,7 +256,7 @@ When balance charge 10001000.01
 
 	#TC54,55
 Scenario: T54_55_Charge balance with overall negative result
-Given get active user id
+	Given get active user id
 	When balance charge <Amount>
 	Then charge balance response Status is 'InternalServerError'
 	And charge balance response Content is: <ExpectedMessage>

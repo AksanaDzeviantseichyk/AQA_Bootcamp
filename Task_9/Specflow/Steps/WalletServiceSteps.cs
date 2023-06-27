@@ -34,7 +34,7 @@ namespace Task_9.Specflow.Steps
             _walletContext.BalanceChargeResponse = await _walletProvider.BalanceCharge(_userContext.UserId);
         }
 
-        [Given(@"get charge transaction id with '([^']*)' amount")]
+        [Given(@"get charge transaction id with (.*) amount")]
         public async Task GivenGetChargeTransactionIdWithAmount(decimal amount)
         {
             _walletContext.TransactionId = await _walletProvider
@@ -42,10 +42,24 @@ namespace Task_9.Specflow.Steps
         }
 
         [Given(@"revert exist transaction")]
+        [When(@"revert exist transaction")]
         public async Task GivenRevertExistTransaction()
         {
             _walletContext.RevertTransactionResponse = await _walletProvider
                 .RevertExistTransaction(_walletContext.TransactionId);
+            _walletContext.TransactionId = _walletContext.RevertTransactionResponse.Body;
+        }
+
+        [When(@"revert wrong transaction")]
+        public async Task WhenRevertWrongTransaction()
+        {
+            _walletContext.RevertTransactionResponse = await _walletProvider.RevertWrongTransaction();
+        }
+
+        [When(@"get transaction")]
+        public async Task WhenGetTransaction()
+        {
+            _walletContext.GetTransactionResponse = await _walletProvider.GetTransaction(_userContext.UserId);
         }
     }
 }
