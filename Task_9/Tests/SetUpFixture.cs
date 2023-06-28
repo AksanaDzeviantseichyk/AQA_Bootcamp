@@ -3,7 +3,7 @@
 namespace Task_9.Tests
 {
     [SetUpFixture]
-    public class SetUpFixture: BaseTest
+    public class SetUpFixture : BaseTest
     {
         [OneTimeSetUp]
         public void OneTimeSetUp()

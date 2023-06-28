@@ -9,7 +9,12 @@ namespace Task_9.Core.Observers
 {
     public class RegisterUserObserver : IObserver<int>
     {
-        private readonly ConcurrentBag<int> _data = new ConcurrentBag<int>();
+        private readonly ConcurrentBag<int> _data;
+        public RegisterUserObserver(ConcurrentBag<int> data)
+        {
+            _data = data;
+        }
+
         public void OnNext(int value)
         {
             if (!_data.Contains(value))

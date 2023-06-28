@@ -5,7 +5,7 @@ using NodaTime;
 
 namespace Task_9.Tests
 {
-    public class WalletServiceTests: BaseTest
+    public class WalletServiceTests:BaseTest
     {
         private readonly string _notActiveUserMessage = "not active user";
 

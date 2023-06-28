@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 //[assembly: Parallelizable(ParallelScope.All)]
+//[assembly: Parallelizable(ParallelScope.Fixtures)]
 //[assembly: LevelOfParallelism(5)]
 
 // Следующий GUID служит для идентификации библиотеки типов typelib, если этот проект

@@ -1,20 +1,32 @@
 ﻿using System.Collections.Concurrent;
-using Task_9.Tests;
+using Task_9.Core.Contracts;
+using Task_9.Core.Observers;
 using TechTalk.SpecFlow;
 
 namespace Task_9.Specflow.Steps
 {
     [Binding]
-    public sealed class WalletServiceSteps: BaseTest
+    public sealed class WalletServiceSteps
     {
         private readonly UserDataContext _userContext;
         private readonly WalletDataContext _walletContext;
+        private readonly IWalletServiceProvider _walletProvider;
+        private readonly RegisterUserObserver _registerUserObserver;
+        private readonly DeleteAndChargeObserver _deleteAndChargeObserver;
+
 
         public WalletServiceSteps(UserDataContext userContext,
-            WalletDataContext walletContext)
+            WalletDataContext walletContext,
+            IWalletServiceProvider walletProvider,
+            RegisterUserObserver registerUserObserver,
+            DeleteAndChargeObserver deleteAndChargeObserver)
         {
             _userContext = userContext;
             _walletContext = walletContext;
+            _walletProvider = walletProvider;
+            _registerUserObserver = registerUserObserver;
+            _deleteAndChargeObserver = deleteAndChargeObserver;
+            
         }
         [When(@"get user balance")]
         public async Task WhenGetUserBalance()

@@ -1,9 +1,12 @@
 ﻿using Autofac;
+using System.Collections.Concurrent;
 using Task_9.Core.Clients;
 using Task_9.Core.Contracts;
 using Task_9.Core.Observers;
 using Task_9.Core.Providers;
 using Task_9.Core.Utils;
+using Task_9.Specflow;
+using Task_9.Specflow.Steps;
 
 namespace Task_9.Core.Modules
 {
@@ -43,11 +46,56 @@ namespace Task_9.Core.Modules
 
             builder
                 .RegisterType<RegisterUserObserver>()
+                .SingleInstance()
                 .AsSelf();
 
             builder
                 .RegisterType<DeleteAndChargeObserver>()
+                .SingleInstance()
                 .AsSelf();
+            builder
+               .RegisterType<ConcurrentBag<int>>()
+               .AsSelf();
+            builder
+                .RegisterType<UserObservers>()
+                .AsSelf()
+                .SingleInstance();
+            builder
+               .RegisterType<HttpClient>()
+               .AsSelf();
+            builder
+              .RegisterType<ConcurrentBag<RegisterUserObserver>>()
+              .AsSelf()
+              .SingleInstance();
+            builder
+              .RegisterType<ConcurrentBag<DeleteAndChargeObserver>>()
+              .AsSelf()
+              .SingleInstance();
+            builder
+                .RegisterType<ConcurrentBag<IObserver<int>>>()
+                .AsSelf()
+                .SingleInstance();
+            builder
+               .RegisterType<UserServiceSteps>()
+               .AsSelf();
+            builder
+                .RegisterType<UserServiceAssertSteps>()
+                .AsSelf();
+            builder
+               .RegisterType<WalletServiceSteps>()
+               .AsSelf();
+            builder
+                .RegisterType<WalletServiceAssertSteps>()
+                .AsSelf();
+            builder
+               .RegisterType<UserDataContext>()
+               .SingleInstance()
+               .AsSelf();
+            builder
+               .RegisterType<WalletDataContext>()
+               .SingleInstance()
+               .AsSelf();
+
         }
     }
 }

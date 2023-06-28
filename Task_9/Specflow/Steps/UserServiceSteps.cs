@@ -1,16 +1,26 @@
-using Task_9.Tests;
+using Task_9.Core.Contracts;
+using Task_9.Core.Observers;
 using TechTalk.SpecFlow;
 
 namespace Task_9.Specflow.Steps
 {
     [Binding]
-    public class UserServiceSteps:BaseTest
+    public class UserServiceSteps
     {
         private readonly UserDataContext _userContext;
+        private readonly IUserServiceProvider _userProvider;
+        private readonly RegisterUserObserver _registerUserObserver;
+        private readonly DeleteAndChargeObserver _deleteAndChargeObserver;
 
-        public UserServiceSteps(UserDataContext userContext)
+        public UserServiceSteps(UserDataContext userContext,
+            IUserServiceProvider userProvider, 
+            RegisterUserObserver registerUserObserver,
+            DeleteAndChargeObserver deleteAndChargeObserver)
         {
             _userContext = userContext;
+            _userProvider = userProvider;
+            _registerUserObserver = registerUserObserver;
+            _deleteAndChargeObserver = deleteAndChargeObserver;
         }
 
         [When(@"register valid user")]
