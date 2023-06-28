@@ -13,13 +13,14 @@ namespace Task_9.Specflow
         public ConcurrentBag<RegisterUserObserver> RegisterUserObservers { get; }
         public ConcurrentBag<DeleteAndChargeObserver> DeleteUserObservers { get; }
 
-        public UserObservers(ConcurrentBag<RegisterUserObserver> registerUserObservers,
+        public UserObservers(
+            ConcurrentBag<RegisterUserObserver> registerUserObservers,
             ConcurrentBag<DeleteAndChargeObserver> deleteUserObservers)
         {
             RegisterUserObservers = registerUserObservers;
             DeleteUserObservers = deleteUserObservers;
         }
-        public RegisterUserObserver GetRegisterUserObserver()
+       public RegisterUserObserver GetRegisterUserObserver()
         {
             return RegisterUserObservers.FirstOrDefault();
         }

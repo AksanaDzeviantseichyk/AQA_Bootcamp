@@ -9,18 +9,13 @@ namespace Task_9.Specflow.Steps
     {
         private readonly UserDataContext _userContext;
         private readonly IUserServiceProvider _userProvider;
-        private readonly RegisterUserObserver _registerUserObserver;
-        private readonly DeleteAndChargeObserver _deleteAndChargeObserver;
-
+        
         public UserServiceSteps(UserDataContext userContext,
-            IUserServiceProvider userProvider, 
-            RegisterUserObserver registerUserObserver,
-            DeleteAndChargeObserver deleteAndChargeObserver)
+            IUserServiceProvider userProvider)
         {
             _userContext = userContext;
             _userProvider = userProvider;
-            _registerUserObserver = registerUserObserver;
-            _deleteAndChargeObserver = deleteAndChargeObserver;
+            
         }
 
         [When(@"register valid user")]

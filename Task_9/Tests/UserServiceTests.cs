@@ -6,7 +6,7 @@ using Task_9.Core.Utils;
 
 namespace Task_9.Tests
 {
-    public class UserServiceTests: BaseTest
+    public class UserServiceTests : BaseTest
     {
         private readonly string _noElementsMessage = "Sequence contains no elements";
         private readonly string _cannotFindUserIdMessage = "Specified argument was out of the range of valid values. (Parameter 'cannot find user with this id')";
@@ -36,7 +36,7 @@ namespace Task_9.Tests
         {
             // Action
             var response = await _userProvider.RegisterValidUser(request);
-            
+
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, response.Status,
                 $"User with FirstName = {request.FirstName} and LastName = {request.LastName} IS NOT register");

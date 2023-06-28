@@ -11,15 +11,14 @@ namespace Task_9.Core.Clients
 {
     public class WalletServiceClient: IWalletServiceClient, IObservable<int>
     {
-        private readonly HttpClient _client;
+        private readonly HttpClient _client =new HttpClient();
         private readonly string _baseUrl = "https://walletservice-uat.azurewebsites.net";
         private readonly ConcurrentBag<IObserver<int>> _chargeBalanceObservers;
-        public WalletServiceClient(HttpClient client, ConcurrentBag<IObserver<int>> chargeBalanceObservers)
+        
+        public WalletServiceClient(ConcurrentBag<IObserver<int>> chargeBalanceObservers)
         {
-            _client = client;
             _chargeBalanceObservers = chargeBalanceObservers;
         }
-
         public async Task<CommonResponse<decimal>> GetBalance(int userId)
         {
             var httpRequestMessage = new HttpRequestMessage

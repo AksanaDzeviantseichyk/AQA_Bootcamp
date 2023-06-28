@@ -12,20 +12,16 @@ namespace Task_9.Core.Clients
 {
     public class UserServiceClient: IUserServiceClient, IObservable<int>
     {
-        private readonly HttpClient _client;
+        private readonly HttpClient _client =new HttpClient();
         private readonly string _baseUrl = "https://userservice-uat.azurewebsites.net";
         private readonly ConcurrentBag<RegisterUserObserver> _registerUserObservers;
         private readonly ConcurrentBag<DeleteAndChargeObserver> _deleteUserObservers;
-        private readonly UserObservers _userObservers;
-        public UserServiceClient(HttpClient client,
-            ConcurrentBag<RegisterUserObserver> registerUserObservers,
-            ConcurrentBag<DeleteAndChargeObserver> deleteUserObservers,
-            UserObservers userObservers)
+        
+        public UserServiceClient(ConcurrentBag<RegisterUserObserver> registerUserObservers,
+            ConcurrentBag<DeleteAndChargeObserver> deleteUserObservers)
         {
-            _client = client;
             _registerUserObservers = registerUserObservers;
             _deleteUserObservers = deleteUserObservers;
-            _userObservers = userObservers;
         }
         public async Task<CommonResponse<int>> RegisterNewUser(RegisterNewUserRequest request)
         {
@@ -92,39 +88,30 @@ namespace Task_9.Core.Clients
         {
             if (observer is RegisterUserObserver registerObserver)
             {
-                //_registerUserObservers.Add(registerObserver);
-                _userObservers.RegisterUserObservers.Add(registerObserver);
+                _registerUserObservers.Add(registerObserver);
             }
             else if (observer is DeleteAndChargeObserver deleteObserver)
             {
-                //_deleteUserObservers.Add(deleteObserver);
-                _userObservers.DeleteUserObservers.Add(deleteObserver);
+                _deleteUserObservers.Add(deleteObserver);
             }
             return null;
         }    
         public void NotifyRegisterUserObservers (int userId)
         {
-            foreach(RegisterUserObserver observer in _registerUserObservers)
+            foreach (RegisterUserObserver observer in _registerUserObservers)
             {
                 observer.OnNext(userId);
             }
-            foreach (RegisterUserObserver observer in _userObservers.RegisterUserObservers)
-            {
-                observer.OnNext(userId);
-            }
+            
         }
         public void NotifyDeleteUserObservers(int userId)
         {
-            
+
             foreach (DeleteAndChargeObserver observer in _deleteUserObservers)
             {
                 observer.OnNext(userId);
             }
 
-            foreach (DeleteAndChargeObserver observer in _userObservers.DeleteUserObservers)
-            {
-                observer.OnNext(userId);
-            }
         }
     }
 }

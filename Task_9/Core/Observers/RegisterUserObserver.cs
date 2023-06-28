@@ -9,11 +9,7 @@ namespace Task_9.Core.Observers
 {
     public class RegisterUserObserver : IObserver<int>
     {
-        private readonly ConcurrentBag<int> _data;
-        public RegisterUserObserver(ConcurrentBag<int> data)
-        {
-            _data = data;
-        }
+        private readonly ConcurrentBag<int> _data = new ConcurrentBag<int>();   
 
         public void OnNext(int value)
         {

@@ -10,7 +10,7 @@ using Task_9.Specflow.Steps;
 
 namespace Task_9.Core.Modules
 {
-    public class TestDependencyModule: Module
+    public class TestDependencyModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {
@@ -43,36 +43,29 @@ namespace Task_9.Core.Modules
                 .RegisterType<WalletServiceProvider>()
                 .As<IWalletServiceProvider>()
                 .AsSelf();
-
             builder
                 .RegisterType<RegisterUserObserver>()
                 .SingleInstance()
                 .AsSelf();
-
+            builder
+                .RegisterType<ConcurrentBag<RegisterUserObserver>>()
+                .SingleInstance()
+                .AsSelf();
+            
             builder
                 .RegisterType<DeleteAndChargeObserver>()
                 .SingleInstance()
                 .AsSelf();
             builder
-               .RegisterType<ConcurrentBag<int>>()
-               .AsSelf();
-            builder
-                .RegisterType<UserObservers>()
-                .AsSelf()
-                .SingleInstance();
-            builder
-               .RegisterType<HttpClient>()
-               .AsSelf();
-            builder
-              .RegisterType<ConcurrentBag<RegisterUserObserver>>()
-              .AsSelf()
-              .SingleInstance();
-            builder
-              .RegisterType<ConcurrentBag<DeleteAndChargeObserver>>()
-              .AsSelf()
-              .SingleInstance();
+                .RegisterType<ConcurrentBag<DeleteAndChargeObserver>>()
+                .SingleInstance()
+                .AsSelf();
             builder
                 .RegisterType<ConcurrentBag<IObserver<int>>>()
+                .SingleInstance()
+                .AsSelf();
+            builder
+                .RegisterType<UserObservers>()
                 .AsSelf()
                 .SingleInstance();
             builder

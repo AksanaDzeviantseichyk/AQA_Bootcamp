@@ -4,11 +4,8 @@ namespace Task_9.Core.Observers
 {
     public class DeleteAndChargeObserver : IObserver<int>
     {
-        private readonly ConcurrentBag<int> _data;
-        public DeleteAndChargeObserver(ConcurrentBag<int> data)
-        {
-            _data=data;
-        }
+        private readonly ConcurrentBag<int> _data = new ConcurrentBag<int> ();
+        
         public void OnNext(int value)
         {
             if (!_data.Contains(value))

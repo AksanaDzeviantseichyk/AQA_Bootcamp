@@ -5,7 +5,7 @@ using NodaTime;
 
 namespace Task_9.Tests
 {
-    public class WalletServiceTests:BaseTest
+    public class WalletServiceTests : BaseTest
     {
         private readonly string _notActiveUserMessage = "not active user";
 
@@ -109,7 +109,7 @@ namespace Task_9.Tests
         {
             //Precondition
             var notActiveUserId = await _userProvider.GetNotActiveUserId();
-            
+
             //Action
             var responseGetBalance = await _walletProvider.BalanceCharge(notActiveUserId);
 
@@ -127,7 +127,7 @@ namespace Task_9.Tests
         {
             //Precondition
             var notExistUserId = await _userProvider.GetNotExistUserId();
-            
+
             //Action
             var responseBalanceCharge = await _walletProvider.BalanceCharge(notExistUserId);
             //Assert
@@ -144,7 +144,7 @@ namespace Task_9.Tests
         {
             //Precondition
             var activeUserId = await _userProvider.GetActiveUserId();
-            
+
             //Action
             var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, 0);
             //Assert
@@ -162,7 +162,7 @@ namespace Task_9.Tests
         {
             //Precondition
             var activeUserId = await _userProvider.GetActiveUserId();
-            
+
             //Action
             var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, 0.001m);
             //Assert
@@ -217,7 +217,7 @@ namespace Task_9.Tests
         {
             //Precondition
             var activeUserId = await _userProvider.GetActiveUserId();
-          
+
             //Action
             var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, negativeAmount);
             //Assert
@@ -243,7 +243,7 @@ namespace Task_9.Tests
             var activeUserId = await _userProvider.GetActiveUserId();
             await _walletProvider.BalanceCharge(activeUserId, balanceN);
             await _walletProvider.BalanceCharge(activeUserId, charge1);
-           
+
             //Action
             var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, charge2);
             var responseGetBalance = await _walletProvider.GetBalance(activeUserId);
@@ -261,7 +261,7 @@ namespace Task_9.Tests
         {
             //Precondition
             var activeUserId = await _userProvider.GetActiveUserId();
-           
+
             //Action
             var responseBalanceCharge = await _walletProvider.BalanceCharge(activeUserId, inpossibleAmount);
             //Assert
@@ -418,11 +418,11 @@ namespace Task_9.Tests
             DateTimeZone desiredTimeZone = DateTimeZoneProviders.Tzdb["Etc/GMT"];
             ZonedDateTime currentZonedDateTime = SystemClock.Instance.GetCurrentInstant().InZone(desiredTimeZone);
             LocalDate expectedDate = currentZonedDateTime.Date;
-            
+
             //Action
             var responseTransaction = await _walletProvider.GetTransaction(activeUserId);
             //Assert
-            
+
             LocalDate actualDate = LocalDate.FromDateTime(responseTransaction.Body[0].Time.Date);
             Assert.Multiple(() =>
             {
@@ -492,4 +492,3 @@ namespace Task_9.Tests
 
     }
 }
- 

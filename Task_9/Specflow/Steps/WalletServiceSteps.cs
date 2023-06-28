@@ -11,21 +11,14 @@ namespace Task_9.Specflow.Steps
         private readonly UserDataContext _userContext;
         private readonly WalletDataContext _walletContext;
         private readonly IWalletServiceProvider _walletProvider;
-        private readonly RegisterUserObserver _registerUserObserver;
-        private readonly DeleteAndChargeObserver _deleteAndChargeObserver;
-
-
+        
         public WalletServiceSteps(UserDataContext userContext,
             WalletDataContext walletContext,
-            IWalletServiceProvider walletProvider,
-            RegisterUserObserver registerUserObserver,
-            DeleteAndChargeObserver deleteAndChargeObserver)
+            IWalletServiceProvider walletProvider)
         {
             _userContext = userContext;
             _walletContext = walletContext;
             _walletProvider = walletProvider;
-            _registerUserObserver = registerUserObserver;
-            _deleteAndChargeObserver = deleteAndChargeObserver;
             
         }
         [When(@"get user balance")]

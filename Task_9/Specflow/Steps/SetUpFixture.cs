@@ -1,5 +1,7 @@
 ﻿using Autofac;
 using SpecFlow.Autofac;
+using System.Collections.Concurrent;
+using Task_9.Core.Clients;
 using Task_9.Core.Contracts;
 using Task_9.Core.Modules;
 using Task_9.Core.Observers;
@@ -14,8 +16,9 @@ namespace Task_9.Specflow.Steps
         private static  IWalletServiceClient _walletClient;
         private static  RegisterUserObserver _registerUserObserver;
         private static  DeleteAndChargeObserver _deleteAndChargeObserver;
-        private static UserObservers _userObservers;
-        
+        private static IContainer _container;
+
+
         [ScenarioDependencies]
         public static ContainerBuilder ScenarioDependencies()
         {
@@ -27,28 +30,25 @@ namespace Task_9.Specflow.Steps
         [BeforeTestRun]
         public static void OneTimeSetUp()
         {
-            var container = ScenarioDependencies().Build();
-            _userClient = container.Resolve<IUserServiceClient>();
-            _walletClient = container.Resolve<IWalletServiceClient>();
-            _registerUserObserver = container.Resolve<RegisterUserObserver>();
-            _deleteAndChargeObserver = container.Resolve<DeleteAndChargeObserver>();
-            _userObservers = container.Resolve<UserObservers>();
-                
+            var builder = ScenarioDependencies();
+            _container = builder.Build();
+            _userClient = _container.Resolve<IUserServiceClient>();
+            _walletClient = _container.Resolve<IWalletServiceClient>();
+            _registerUserObserver = _container.Resolve<RegisterUserObserver>();
+            _deleteAndChargeObserver = _container.Resolve<DeleteAndChargeObserver>();
+                        
             _userClient.Subscribe(_registerUserObserver);
             _userClient.Subscribe(_deleteAndChargeObserver);
             _walletClient.Subscribe(_deleteAndChargeObserver);
-
         }
 
         [AfterTestRun]
         public static async Task OneTimeTearDown()
         {
-            var registerUserObserver = _userObservers.GetRegisterUserObserver();
-            var deleteAndChargeObserver = _userObservers.GetDeleteAndChargeObserver();
-                        
-            var deleteUsers = registerUserObserver
+            
+            var deleteUsers = _registerUserObserver
                 .GetAllUsers()
-                .Except(deleteAndChargeObserver
+                .Except(_deleteAndChargeObserver
                 .GetAllUsers());
 
             var tasks = deleteUsers
