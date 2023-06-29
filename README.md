@@ -1,11 +1,41 @@
-# AQA_Bootcamp
-This repo has the following branches with task solutions for AQA TI Bootcamp:
-1. Task4 contains solutions to tasks in object-oriented programming.
-2. Task5 contains test scenarios for the public  Open() and GetCurrentField() methods of the 'GameProcessor' class in the Minesweeper game.
-3. Task5Optional contains tests using NUnit library for public methods CreateOrder(), AddItem(), CancelItem() and Checkout () of 'OrderProvider'  class for RestaurantErp (Enterprise resource planning) Application.
-4. Task6 contains solution to the task of working with collections
-5. Task7 contains solution to the task of writing queries using LINQ.
-6. Task9 contains tests using NUnit Library to test the functionality of the backend part of application.
-7. Task10 contains an implementation of the feature of deleting users added to the database during testing using the Observer pattern for Task 9. 
-8. Task15 cantains an implementation of UI tests using Selenium
-9. Task16 - Regular Expression
+# Task 19 (Optional) - Reflection
+
+Implement the string Serialize (object model) method in the CustomConverter class, accepting a data model and returning its serialized value in the provided serialization format.
+
+1. A complex entity with nested fields must have a structure:
+
+[section.begin]
+
+Property1Name = Property1Value
+
+Property2Name = Property2Value
+
+[section.end]
+
+2. A complex entity with complex nested fields that have nested fields must have a structure:
+
+[section.begin]
+
+Property1Name = Property1Value
+
+Property2Name = Property2Value
+
+     [section.begin]
+
+     InnerProperty1Name = InnerProperty1Value
+
+     InnerProperty2Name = InnerProperty2Value
+
+     [section.end]
+
+[section.end]
+
+3. The level of possible nesting is unlimited
+
+4. Neglect the ability to store collections
+
+5. Serialize only properties, fields can be omited.
+6. Serialize only properties that have the CustomSerializeAttribute attribute. If the Name attribute parameter is specified, take its value as the field name during serialization. If not specified, the name of the field in the text representation of the model is taken from the name of the class property.
+
+
+
