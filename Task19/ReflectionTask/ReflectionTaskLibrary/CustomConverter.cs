@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReflectionTask;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -30,27 +31,40 @@ namespace ReflectionTaskLibrary
             }
             else
             {
+
                 IList<PropertyInfo> properties = new List<PropertyInfo>(type.GetProperties());
                 serializedString.Append("[section.begin]");
                 serializedString.Append(Environment.NewLine);
                 foreach (PropertyInfo property in properties)
                 {
-                    string propertyName = property.Name;
-                    object propertyValue = property.GetValue(model);
-                    if (IsComplexType(property.PropertyType))
+                    if (property.IsDefined(typeof(CustomSerializeAttribute)))
                     {
-                        
-                    }
-                    else
-                    {
-                        serializedString.Append(propertyName);
-                        serializedString.Append(" = ");
-                        var isNull = propertyValue != null ? serializedString.Append(propertyValue.ToString().Replace('.',',')): serializedString.Append("null");
-                        serializedString.Append(Environment.NewLine);
-                    }
+                        CustomSerializeAttribute attribute = property.GetCustomAttribute<CustomSerializeAttribute>();
+                        string propertyName = attribute.Name ?? property.Name;
+                        object propertyValue = property.GetValue(model);
+                        if (IsComplexType(property.PropertyType))
+                        {
+                            if (propertyValue != null)
+                            {
+
+                            }
+
+
+                        }
+                        else
+                        {
+
+                            if (propertyValue != null)
+                            {
+                                serializedString.Append(propertyName);
+                                serializedString.Append(" = ");
+                                serializedString.Append(propertyValue.ToString().Replace('.', ','));
+                                serializedString.Append(Environment.NewLine);
+                            }
+                        }
+                    }     
                 }
                 serializedString.Append("[section.end]");
-                serializedString.Append(Environment.NewLine);
                 return serializedString.ToString();
             }
             return serializedString.ToString();
