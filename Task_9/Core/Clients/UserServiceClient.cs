@@ -14,15 +14,15 @@ namespace Task_9.Core.Clients
     {
         private readonly HttpClient _client =new HttpClient();
         private readonly string _baseUrl = "https://userservice-uat.azurewebsites.net";
-        private readonly ConcurrentBag<RegisterUserObserver> _registerUserObservers;
-        private readonly ConcurrentBag<DeleteAndChargeObserver> _deleteUserObservers;
+        private readonly ConcurrentBag<RegisterUserObserver> _registerUserObservers = new ConcurrentBag<RegisterUserObserver>();
+        private readonly ConcurrentBag<DeleteAndChargeObserver> _deleteUserObservers = new ConcurrentBag<DeleteAndChargeObserver>();
         
-        public UserServiceClient(ConcurrentBag<RegisterUserObserver> registerUserObservers,
-            ConcurrentBag<DeleteAndChargeObserver> deleteUserObservers)
-        {
-            _registerUserObservers = registerUserObservers;
-            _deleteUserObservers = deleteUserObservers;
-        }
+        //public UserServiceClient(ConcurrentBag<RegisterUserObserver> registerUserObservers,
+        //    ConcurrentBag<DeleteAndChargeObserver> deleteUserObservers)
+        //{
+        //    _registerUserObservers = registerUserObservers;
+        //    _deleteUserObservers = deleteUserObservers;
+        //}
         public async Task<CommonResponse<int>> RegisterNewUser(RegisterNewUserRequest request)
         {
             var httpRequestMessage = new HttpRequestMessage

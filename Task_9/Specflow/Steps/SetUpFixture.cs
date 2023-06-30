@@ -12,11 +12,12 @@ namespace Task_9.Specflow.Steps
     [Binding]
     public class SetUpFixture
     {
-        private static  IUserServiceClient _userClient;
-        private static  IWalletServiceClient _walletClient;
-        private static  RegisterUserObserver _registerUserObserver;
-        private static  DeleteAndChargeObserver _deleteAndChargeObserver;
-        private static IContainer _container;
+        //private static IContainer _container = ScenarioDependencies().Build();
+        //private static  IUserServiceClient _userClient = _container.Resolve<IUserServiceClient>();
+        //private static  IWalletServiceClient _walletClient = _container.Resolve<IWalletServiceClient>();
+        private static  RegisterUserObserver _registerUserObserver = new RegisterUserObserver();
+        private static  DeleteAndChargeObserver _deleteAndChargeObserver = new DeleteAndChargeObserver();
+        
 
 
         [ScenarioDependencies]
@@ -27,23 +28,38 @@ namespace Task_9.Specflow.Steps
             return builder;
         }
 
-        [BeforeTestRun]
-        public static void OneTimeSetUp()
-        {
-            var builder = ScenarioDependencies();
-            _container = builder.Build();
-            _userClient = _container.Resolve<IUserServiceClient>();
-            _walletClient = _container.Resolve<IWalletServiceClient>();
-            _registerUserObserver = _container.Resolve<RegisterUserObserver>();
-            _deleteAndChargeObserver = _container.Resolve<DeleteAndChargeObserver>();
+        //[BeforeTestRun]
+        //public static void OneTimeSetUp()
+        //{
+        //    //var builder = ScenarioDependencies();
+        //    //_container = builder.Build();
+        //    //_userClient = _container.Resolve<IUserServiceClient>();
+        //    //_walletClient = _container.Resolve<IWalletServiceClient>();
+        //    //_registerUserObserver = _container.Resolve<RegisterUserObserver>();
+        //    //_deleteAndChargeObserver = _container.Resolve<DeleteAndChargeObserver>();
                         
-            _userClient.Subscribe(_registerUserObserver);
-            _userClient.Subscribe(_deleteAndChargeObserver);
-            _walletClient.Subscribe(_deleteAndChargeObserver);
+        //    _userClient.Subscribe(_registerUserObserver);
+        //    _userClient.Subscribe(_deleteAndChargeObserver);
+        //    _walletClient.Subscribe(_deleteAndChargeObserver);
+        //}
+
+        [BeforeScenario]
+        public static void BeforeScenario(UserServiceClient userClient, WalletServiceClient walletClient)
+        {
+            //var builder = ScenarioDependencies();
+            //_container = builder.Build();
+            //_userClient = _container.Resolve<IUserServiceClient>();
+            //_walletClient = _container.Resolve<IWalletServiceClient>();
+            //_registerUserObserver = _container.Resolve<RegisterUserObserver>();
+            //_deleteAndChargeObserver = _container.Resolve<DeleteAndChargeObserver>();
+
+            userClient.Subscribe(_registerUserObserver);
+            userClient.Subscribe(_deleteAndChargeObserver);
+            walletClient.Subscribe(_deleteAndChargeObserver);
         }
 
         [AfterTestRun]
-        public static async Task OneTimeTearDown()
+        public static async Task OneTimeTearDown(UserServiceClient _userClient)
         {
             
             var deleteUsers = _registerUserObserver
