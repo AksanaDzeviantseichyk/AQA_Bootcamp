@@ -1,6 +1,12 @@
 ﻿Feature: Wallet Service Tests
 
-A short summary of the feature
+Test the functionality of the backend 
+part of application
+for the GetBalance, 
+ChargeBalance, 
+RevertTransaction, 
+and GetTransaction 
+methods of WalletService
 
 #TC 1,2,15
 Scenario: TC_1_2_15_Get balance new not active user without transaction

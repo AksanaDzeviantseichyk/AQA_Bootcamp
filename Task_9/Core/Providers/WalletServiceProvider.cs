@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
-using Task_9.Core.Clients;
-using Task_9.Core.Contracts;
-using Task_9.Core.Models.Requests;
+﻿using Task_9.Core.Contracts;
 using Task_9.Core.Models.Responses;
 using Task_9.Core.Models.Responses.Base;
 using Task_9.Core.Utils;

@@ -1,6 +1,12 @@
 ﻿Feature: User Service Tests
 
-A short summary of the feature
+Test the functionality of the backend 
+part of application
+for the RegisterNewUser, 
+DeleteUser, 
+SetUserStatus, 
+and GetUserStatus 
+methods of UserService 
 
 #TC 1-7
 Scenario: T1to7_New valid user should be register

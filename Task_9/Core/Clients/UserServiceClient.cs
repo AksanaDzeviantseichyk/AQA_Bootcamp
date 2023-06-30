@@ -2,27 +2,20 @@
 using System.Collections.Concurrent;
 using System.Text;
 using Task_9.Core.Contracts;
+using Task_9.Core.Enum;
 using Task_9.Core.Extensions;
 using Task_9.Core.Models.Requests;
 using Task_9.Core.Models.Responses.Base;
 using Task_9.Core.Observers;
-using Task_9.Specflow;
 
 namespace Task_9.Core.Clients
 {
-    public class UserServiceClient: IUserServiceClient, IObservable<int>
+    public class UserServiceClient: IUserServiceClient
     {
         private readonly HttpClient _client =new HttpClient();
         private readonly string _baseUrl = "https://userservice-uat.azurewebsites.net";
-        private readonly ConcurrentBag<RegisterUserObserver> _registerUserObservers = new ConcurrentBag<RegisterUserObserver>();
-        private readonly ConcurrentBag<DeleteAndChargeObserver> _deleteUserObservers = new ConcurrentBag<DeleteAndChargeObserver>();
-        
-        //public UserServiceClient(ConcurrentBag<RegisterUserObserver> registerUserObservers,
-        //    ConcurrentBag<DeleteAndChargeObserver> deleteUserObservers)
-        //{
-        //    _registerUserObservers = registerUserObservers;
-        //    _deleteUserObservers = deleteUserObservers;
-        //}
+        private readonly ConcurrentBag<IObserver<UserActionInfo>> _userObservers = new ConcurrentBag<IObserver<UserActionInfo>>();
+
         public async Task<CommonResponse<int>> RegisterNewUser(RegisterNewUserRequest request)
         {
             var httpRequestMessage = new HttpRequestMessage
@@ -36,7 +29,11 @@ namespace Task_9.Core.Clients
             var commonResponse = await response.ToCommonResponse<int>(); 
             if (response.IsSuccessStatusCode)
             {
-                NotifyRegisterUserObservers(commonResponse.Body);
+                NotifyUserObservers(new UserActionInfo
+                {
+                    Id = commonResponse.Body,
+                    Action = UserAction.Created
+                });
             }
 
             return commonResponse;
@@ -53,7 +50,11 @@ namespace Task_9.Core.Clients
             HttpResponseMessage response = await _client.SendAsync(httpRequestMessage);
             if (response.IsSuccessStatusCode)
             {
-                NotifyDeleteUserObservers(userId);
+                NotifyUserObservers(new UserActionInfo
+                { 
+                    Id = userId,
+                    Action = UserAction.Deleted
+                });
             }
 
             return await response.ToCommonResponse<object>();
@@ -84,34 +85,17 @@ namespace Task_9.Core.Clients
 
             return await response.ToCommonResponse<bool>();
         }
-        public IDisposable Subscribe(IObserver<int> observer)
+        public void NotifyUserObservers (UserActionInfo info)
         {
-            if (observer is RegisterUserObserver registerObserver)
+            foreach (var observer in _userObservers)
             {
-                _registerUserObservers.Add(registerObserver);
-            }
-            else if (observer is DeleteAndChargeObserver deleteObserver)
-            {
-                _deleteUserObservers.Add(deleteObserver);
-            }
-            return null;
-        }    
-        public void NotifyRegisterUserObservers (int userId)
-        {
-            foreach (RegisterUserObserver observer in _registerUserObservers)
-            {
-                observer.OnNext(userId);
-            }
-            
+                observer.OnNext(info);
+            }            
         }
-        public void NotifyDeleteUserObservers(int userId)
+        public IDisposable Subscribe(IObserver<UserActionInfo> observer)
         {
-
-            foreach (DeleteAndChargeObserver observer in _deleteUserObservers)
-            {
-                observer.OnNext(userId);
-            }
-
+            _userObservers.Add(observer);
+            return null;
         }
     }
 }

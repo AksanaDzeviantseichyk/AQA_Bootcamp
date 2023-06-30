@@ -13,9 +13,7 @@ namespace Task_9.Tests
         protected readonly IWalletServiceProvider _walletProvider = _scope.Resolve<IWalletServiceProvider>();
         protected readonly IUserServiceClient _userClient = _scope.Resolve<IUserServiceClient>();
         protected readonly IWalletServiceClient _walletClient = _scope.Resolve<IWalletServiceClient>();
-        protected readonly RegisterUserObserver _registerUserObserver = _scope.Resolve<RegisterUserObserver>();
-        protected readonly DeleteAndChargeObserver _deleteAndChargeObserver = _scope.Resolve<DeleteAndChargeObserver>();
-
+        protected readonly UserActionObserver _userActionObserver = _scope.Resolve<UserActionObserver>();
         protected static ILifetimeScope _scope;
 
         static BaseTest()
@@ -28,7 +26,5 @@ namespace Task_9.Tests
 
             _scope = container.BeginLifetimeScope();
         }
-
-
     }
 }

@@ -2,23 +2,21 @@
 using System.Collections.Concurrent;
 using System.Text;
 using Task_9.Core.Contracts;
+using Task_9.Core.Enum;
 using Task_9.Core.Extensions;
 using Task_9.Core.Models.Requests;
 using Task_9.Core.Models.Responses;
 using Task_9.Core.Models.Responses.Base;
+using Task_9.Core.Observers;
 
 namespace Task_9.Core.Clients
 {
-    public class WalletServiceClient: IWalletServiceClient, IObservable<int>
+    public class WalletServiceClient: IWalletServiceClient
     {
         private readonly HttpClient _client =new HttpClient();
         private readonly string _baseUrl = "https://walletservice-uat.azurewebsites.net";
-        private readonly ConcurrentBag<IObserver<int>> _chargeBalanceObservers;
-        
-        public WalletServiceClient(ConcurrentBag<IObserver<int>> chargeBalanceObservers)
-        {
-            _chargeBalanceObservers = chargeBalanceObservers;
-        }
+        private readonly ConcurrentBag<IObserver<UserActionInfo>> _userObservers = new ConcurrentBag<IObserver<UserActionInfo>>();
+
         public async Task<CommonResponse<decimal>> GetBalance(int userId)
         {
             var httpRequestMessage = new HttpRequestMessage
@@ -43,7 +41,11 @@ namespace Task_9.Core.Clients
             HttpResponseMessage response = await _client.SendAsync(httpRequestMessage);
             if (response.IsSuccessStatusCode)
             {
-                NotifyChargeBalanceObservers(request.UserId);
+                NotifyUserObservers(new UserActionInfo
+                {
+                    Id = request.UserId,
+                    Action = UserAction.Charged
+                });
             }
 
             return await response.ToCommonResponse<Guid>();
@@ -75,19 +77,19 @@ namespace Task_9.Core.Clients
             return await response.ToCommonResponse<List<GetTransactionInfoResponse>>();
         }
 
-        public IDisposable Subscribe(IObserver<int> observer)
+        public IDisposable Subscribe(IObserver<UserActionInfo> observer)
         {
-            _chargeBalanceObservers.Add(observer);
+            _userObservers.Add(observer);
             return null;
         }
-
-        public void NotifyChargeBalanceObservers(int userId)
+        public void NotifyUserObservers(UserActionInfo info)
         {
-
-            foreach (IObserver<int> observer in _chargeBalanceObservers)
+            foreach (var observer in _userObservers)
             {
-                observer.OnNext(userId);
+                observer.OnNext(info);
             }
+
         }
+
     }
 }
