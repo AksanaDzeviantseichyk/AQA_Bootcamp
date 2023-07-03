@@ -1,8 +1,6 @@
 ﻿using ReflectionTask;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Globalization;
 using System.Reflection;
 using System.Text;
 
@@ -12,67 +10,82 @@ namespace ReflectionTaskLibrary
     {
         public string Serialize(object model)
         {
+            StringBuilder serializedString = new StringBuilder();
             Type type = model.GetType();
-            var serializedString = new StringBuilder();
-            if (!IsComplexType(type))
+            if (IsSimpleType(type))
             {
-                if (type == typeof(Double))
-                {
-                    return serializedString.Append(model.ToString().Replace('.', ',')).ToString();
-                }
-                if (type.IsPrimitive || type == typeof(DayOfWeek))
-                {
-                    return serializedString.Append(model.ToString()).ToString();
-                }
-                if (type == typeof(string))
-                {
-                    return serializedString.Append(model).ToString();
-                }
+                return serializedString
+                    .Append(SimpleSerialize(model))
+                    .ToString();
             }
             else
             {
+                return serializedString
+                    .Append(ComplexSerialize(model, 0))
+                    .Remove(serializedString.Length - 2, 2)
+                    .ToString();                                 
+            }
+        }
 
-                IList<PropertyInfo> properties = new List<PropertyInfo>(type.GetProperties());
-                serializedString.Append("[section.begin]");
-                serializedString.Append(Environment.NewLine);
-                foreach (PropertyInfo property in properties)
+        private string SimpleSerialize(object model)
+        {
+            Type type = model.GetType();
+            if (type == typeof(Double) || type == typeof(float))
+            {
+                return model.ToString().Replace('.', ',');
+            }
+            else 
+            {
+                return model.ToString();
+            }
+        }
+
+        private string ComplexSerialize(object obj, int nestedLevel)
+        {
+            Type type = obj.GetType();
+            IEnumerable<PropertyInfo> properties = type.GetProperties();
+            var serializedString = new StringBuilder();
+
+            string indent = new string(' ', nestedLevel * 10);
+            serializedString.AppendLine($"{indent}[section.begin]");
+            foreach (PropertyInfo property in properties)
+            {
+                if (property.IsDefined(typeof(CustomSerializeAttribute)))
                 {
-                    if (property.IsDefined(typeof(CustomSerializeAttribute)))
+                    CustomSerializeAttribute attribute = property.GetCustomAttribute<CustomSerializeAttribute>();
+                    string propertyName = attribute.Name ?? property.Name;
+                    object propertyValue = property.GetValue(obj);
+                    if (propertyValue != null)
                     {
-                        CustomSerializeAttribute attribute = property.GetCustomAttribute<CustomSerializeAttribute>();
-                        string propertyName = attribute.Name ?? property.Name;
-                        object propertyValue = property.GetValue(model);
-                        if (IsComplexType(property.PropertyType))
+                        if (!IsSimpleType(property.PropertyType))
                         {
-                            if (propertyValue != null)
-                            {
-
-                            }
-
-
+                            serializedString
+                                .Append(ComplexSerialize(propertyValue, nestedLevel, propertyName));
                         }
                         else
                         {
-
-                            if (propertyValue != null)
-                            {
-                                serializedString.Append(propertyName);
-                                serializedString.Append(" = ");
-                                serializedString.Append(propertyValue.ToString().Replace('.', ','));
-                                serializedString.Append(Environment.NewLine);
-                            }
+                            serializedString
+                                .AppendLine($"{indent}{propertyName} = {SimpleSerialize(propertyValue)}");
                         }
-                    }     
+                    }
                 }
-                serializedString.Append("[section.end]");
-                return serializedString.ToString();
             }
+            serializedString.AppendLine($"{indent}[section.end]");
+            return serializedString.ToString();
+        }
+        private string ComplexSerialize(object obj, int nestingLevel, string parentPropertyName)
+        {
+            string indent = new string(' ', nestingLevel * 10);
+            var serializedString = new StringBuilder();
+            serializedString
+                .AppendLine($"{indent}{parentPropertyName} = ")
+                .Append(ComplexSerialize(obj, nestingLevel + 1));
             return serializedString.ToString();
         }
 
-        private static bool IsComplexType(Type type)
+        private bool IsSimpleType(Type type)
         {
-            return !type.IsPrimitive && type != typeof(string) && type != typeof(decimal) && type != typeof(DayOfWeek);
+            return type.IsPrimitive || type == typeof(string) || type == typeof(DayOfWeek);
         }
     }
 }
