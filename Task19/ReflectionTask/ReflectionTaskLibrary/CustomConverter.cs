@@ -9,17 +9,15 @@ namespace ReflectionTaskLibrary
     public class CustomConverter
     {
         public string Serialize(object model)
-        {
-            StringBuilder serializedString = new StringBuilder();
+        {            
             Type type = model.GetType();
             if (IsSimpleType(type))
             {
-                return serializedString
-                    .Append(SimpleSerialize(model))
-                    .ToString();
+                return SimpleSerialize(model);
             }
             else
             {
+                StringBuilder serializedString = new StringBuilder();
                 return serializedString
                     .Append(ComplexSerialize(model, 0))
                     .Remove(serializedString.Length - 2, 2)
@@ -40,10 +38,10 @@ namespace ReflectionTaskLibrary
             }
         }
 
-        private string ComplexSerialize(object obj, int nestedLevel)
+        private string ComplexSerialize(object model, int nestedLevel)
         {
             var serializedString = new StringBuilder();
-            Type type = obj.GetType();
+            Type type = model.GetType();
             IEnumerable<PropertyInfo> properties = type.GetProperties();
             string indent = new string(' ', nestedLevel * 5);
             
@@ -54,14 +52,14 @@ namespace ReflectionTaskLibrary
                 {
                     CustomSerializeAttribute attribute = property.GetCustomAttribute<CustomSerializeAttribute>();
                     string propertyName = attribute.Name ?? property.Name;
-                    object propertyValue = property.GetValue(obj);
+                    object propertyValue = property.GetValue(model);
                     if (propertyValue != null)
                     {
                         if (!IsSimpleType(property.PropertyType))
                         {
                             serializedString
                                 .AppendLine($"{indent}{propertyName} = ")
-                                .Append(ComplexSerialize(obj, nestedLevel + 1));
+                                .Append(ComplexSerialize(model, nestedLevel + 1));
                         }
                         else
                         {
