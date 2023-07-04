@@ -42,11 +42,11 @@ namespace ReflectionTaskLibrary
 
         private string ComplexSerialize(object obj, int nestedLevel)
         {
+            var serializedString = new StringBuilder();
             Type type = obj.GetType();
             IEnumerable<PropertyInfo> properties = type.GetProperties();
-            var serializedString = new StringBuilder();
-
-            string indent = new string(' ', nestedLevel * 10);
+            string indent = new string(' ', nestedLevel * 5);
+            
             serializedString.AppendLine($"{indent}[section.begin]");
             foreach (PropertyInfo property in properties)
             {
