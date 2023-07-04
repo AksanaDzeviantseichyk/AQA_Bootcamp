@@ -60,7 +60,8 @@ namespace ReflectionTaskLibrary
                         if (!IsSimpleType(property.PropertyType))
                         {
                             serializedString
-                                .Append(ComplexSerialize(propertyValue, nestedLevel, propertyName));
+                                .AppendLine($"{indent}{propertyName} = ")
+                                .Append(ComplexSerialize(obj, nestedLevel + 1));
                         }
                         else
                         {
@@ -73,16 +74,7 @@ namespace ReflectionTaskLibrary
             serializedString.AppendLine($"{indent}[section.end]");
             return serializedString.ToString();
         }
-        private string ComplexSerialize(object obj, int nestingLevel, string parentPropertyName)
-        {
-            string indent = new string(' ', nestingLevel * 10);
-            var serializedString = new StringBuilder();
-            serializedString
-                .AppendLine($"{indent}{parentPropertyName} = ")
-                .Append(ComplexSerialize(obj, nestingLevel + 1));
-            return serializedString.ToString();
-        }
-
+        
         private bool IsSimpleType(Type type)
         {
             return type.IsPrimitive || type == typeof(string) || type == typeof(DayOfWeek);
